@@ -1,20 +1,23 @@
-# Plano: versões da cifra e instrumentos
+# Plano 01: versões da cifra (Principal / Simplificada)
 
 ## Contexto
 
-Hoje o app lista versões via `priorityVersions` do SSR do Cifra Club, mas a troca só funciona de ponta a ponta para a versão **Principal** (`cifra-group`).
+O Cifra Club expõe versões da mesma música via `priorityVersions` no SSR. Cada versão tem `instrument.slug` e `label.slug`, que definem a URL.
 
-Problemas identificados:
+## Status geral
 
-| Caso | Situação atual |
-|------|----------------|
-| Principal | Funciona |
-| Simplificada | Aparece no seletor, mas carrega a Principal |
-| Letra | Aparece no seletor, parser não extrai |
-| Baixo / bateria / gaita | Existem em algumas músicas, parser não extrai |
-| Teclado | Raro; muitas músicas não têm transcrição |
+| Caso | Situação |
+|------|----------|
+| Principal | ✅ Funciona |
+| Simplificada | ✅ Funciona (Fase 1 concluída) |
+| Letra | ❌ Ver [02-parser-letra-e-tablaturas.md](./02-parser-letra-e-tablaturas.md) |
+| Baixo | ❌ Ver [02-parser-letra-e-tablaturas.md](./02-parser-letra-e-tablaturas.md) |
+| Bateria / gaita | ⚠️ Parcial — ver [02-parser-letra-e-tablaturas.md](./02-parser-letra-e-tablaturas.md) |
+| Teclado | ❌ Ver [03-teclado.md](./03-teclado.md) |
+| UX do seletor / erros | ❌ Ver [04-ux-seletor-erros.md](./04-ux-seletor-erros.md) |
+| Melhorias de produto | 📋 Ver [05-melhorias-produto.md](./05-melhorias-produto.md) |
 
-## Fase 1 — Versões da mesma cifra (Principal / Simplificada)
+## Fase 1 — Versões da mesma cifra ✅
 
 ### Como o Cifra Club diferencia
 
@@ -25,60 +28,30 @@ Mesmo instrumento (`cifra-group`), URLs distintas pelo `label.slug`:
 /coldplay/the-scientist/simplificada/ → Simplificada (versionId 8799)
 ```
 
-### Mudanças na API (`apps/api`)
+### API (`apps/api`) — concluído
 
-- [x] Incluir `labelSlug` em `ChordVersion` (`principal`, `simplificada`, `original`)
-- [x] Montar path com `label.slug` quando não for `principal`:
-  - `principal` → `/{artist}/{song}/`
-  - `simplificada` → `/{artist}/{song}/simplificada/`
-- [x] Aceitar query `?version=simplificada` em `GET /artists/:artist/songs/:song`
-- [x] `buildFetchUrl` deve combinar `instrument` + `version` (label slug)
+- [x] `labelSlug` em `ChordVersion` (`principal`, `simplificada`, `original`)
+- [x] Path com `label.slug` quando não for `principal`
+- [x] Query `?version=simplificada` em `GET /artists/:artist/songs/:song`
+- [x] `buildFetchUrl` combina `instrument` + `version`
 
-### Mudanças no frontend (`apps/web`)
+### Frontend (`apps/web`) — concluído
 
-- [x] Adicionar `version?: string` em `ChordSearchParams`
-- [x] `VersionSelector`: navegar com `?version=simplificada` quando `labelSlug !== 'principal'`
-- [x] `useChordQuery` / `chordRepository` / offline storage: chave inclui `version`
-- [x] Badge ou label mostrando versão ativa (ex.: "Simplificada")
+- [x] `version?: string` em `ChordSearchParams`
+- [x] `VersionSelector` navega com `?version=simplificada`
+- [x] Offline: chave inclui `version`
+- [x] Badge da versão ativa (ex.: "Simplificada")
 
-### Testes
+### Testes — concluídos
 
-- [x] `coldplay/the-scientist` Principal → acordes `Dm7`, `Bb9`, `F`…
-- [x] `coldplay/the-scientist` Simplificada → acordes `C#m`, `A`, `E`…
+- [x] `coldplay/the-scientist` Principal → `Dm7`, `Bb9`, `F`…
+- [x] `coldplay/the-scientist` Simplificada → `C#m`, `A`, `E`…
 - [x] Troca no seletor altera conteúdo e `versionId`
 - [x] Versão salva offline separadamente da Principal
 
-## Fase 2 — Outros instrumentos (letra, baixo, etc.)
+## Próximos planos
 
-### Parser
-
-- [ ] Letra: extrair bloco de texto puro do SSR (sem `[Primeira Parte]` / `<b>`)
-- [ ] Tablatura baixo/bateria: detectar linhas `G|`, `D|`, `A|` sem exigir `#t1#` + `E|`
-- [ ] Manter suporte atual a violão (`[Primeira Parte]` + `<b>`) e tablatura guitarra (`#t1#`)
-
-### Navegação
-
-- [ ] `?instrument=lyrics` → `/letra/`
-- [ ] `?instrument=bass` → `/tabs-baixo/`
-- [ ] Combinar com `?version=` quando aplicável
-
-### Testes
-
-- [ ] `avenged-sevenfold/buried-alive--` letra
-- [ ] `avenged-sevenfold/buried-alive--` baixo
-- [ ] `legiao-urbana/tempo-perdido` letra
-
-## Fase 3 — Teclado (quando existir)
-
-- [ ] Confirmar músicas com transcrição de teclado no Cifra Club
-- [ ] Path `/teclado/` no parser (já mapeado, não testado)
-- [ ] Exibir no seletor apenas quando existir na página
-- [ ] Parser específico se o formato for diferente de cifra com acordes
-
-> Teclado não aparece em `priorityVersions` na maioria das músicas. Pode exigir descoberta via menu de instrumentos do site, não só SSR inicial.
-
-## Ordem de implementação
-
-1. Fase 1 (Simplificada/Principal) — maior impacto, menor risco
-2. Fase 2 (letra + tablaturas)
-3. Fase 3 (teclado, conforme disponibilidade)
+1. [02-parser-letra-e-tablaturas.md](./02-parser-letra-e-tablaturas.md) — letra, baixo e demais instrumentos
+2. [03-teclado.md](./03-teclado.md) — teclado (quando existir no CC)
+3. [04-ux-seletor-erros.md](./04-ux-seletor-erros.md) — seletor e mensagens de erro
+4. [05-melhorias-produto.md](./05-melhorias-produto.md) — transposição, offline, scraping, etc.
