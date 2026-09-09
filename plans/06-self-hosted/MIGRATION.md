@@ -21,11 +21,11 @@ packages/
 
 ### Checklist
 
-- [ ] Criar workspace `packages/shared` no root `package.json`
-- [ ] Mover parser e tipos (fonte única da verdade)
-- [ ] Garantir que shared **não** importa Hono, Node-only APIs desnecessárias
-- [ ] `fetch` para CC/Solr via interface injetável ou `globalThis.fetch`
-- [ ] Testes unitários do parser em shared (sem servidor)
+- [x] Criar workspace `packages/shared` no root `package.json`
+- [x] Mover parser e tipos (fonte única da verdade)
+- [x] Garantir que shared **não** importa Hono, Node-only APIs desnecessárias
+- [x] `fetch` para CC/Solr via `globalThis.fetch`
+- [x] Testes unitários do parser em shared (vitest)
 
 ### Verificação
 
@@ -48,10 +48,10 @@ const parsed = parseCifraClubHtml(html, ...);
 
 ### Checklist
 
-- [ ] Remover duplicata de parser em `apps/api`
-- [ ] API importa `@cifra-hub/shared`
-- [ ] Comportamento idêntico aos testes curl atuais (regressão)
-- [ ] README: API é **dev convenience**, não destino de produção
+- [x] Remover duplicata de parser em `apps/api`
+- [x] API importa `@cifra-hub/shared`
+- [x] Comportamento idêntico aos testes curl atuais (regressão)
+- [x] README: API é **dev convenience**, não destino de produção
 
 ---
 
