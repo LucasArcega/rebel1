@@ -304,6 +304,9 @@ Consulte `plans/STATUS.md` para lista atualizada.
 | 03 | teclado | Teclado (raro no CC) |
 | 04 | ux-seletor-erros | Seletor e mensagens de erro |
 | 05 | melhorias-produto | Transposição, offline, UX |
+| 06 | self-hosted | Parser no cliente, RN, sem API na nuvem (futuro) |
+
+> **Arquitetura:** `apps/api` é BFF **local** (dev). Plano 06 cobre migração para self-hosted sem hospedar backend. Ver `plans/06-self-hosted/`.
 
 ---
 

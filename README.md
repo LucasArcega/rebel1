@@ -6,9 +6,12 @@ Monorepo React + API para consumir cifras do Cifra Club com arquitetura **FSD (F
 
 ```
 apps/
-  api/   # Parser/proxy Hono (consome HTML SSR do Cifra Club)
+  api/   # BFF local (Node/Hono) — parser + proxy para dev web (CORS)
   web/   # Frontend React (FSD + Bulletproof)
+plans/   # Roadmap numerado — ver plans/STATUS.md
 ```
+
+> A API roda em **localhost** (`npm run dev:api`), não é destinada a hospedagem em nuvem. O plano futuro de arquitetura self-hosted (parser no cliente, React Native) está em [`plans/06-self-hosted/`](./plans/06-self-hosted/README.md).
 
 ### Camadas do frontend (`apps/web/src`)
 
