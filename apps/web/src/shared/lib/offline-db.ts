@@ -9,6 +9,7 @@ export interface OfflineChordRecord {
   artistSlug: string;
   songSlug: string;
   instrument: InstrumentSlug | 'cifra-group';
+  version: string;
   savedAt: string;
   chord: ChordSong;
 }
@@ -17,7 +18,8 @@ export const buildOfflineChordId = (
   artistSlug: string,
   songSlug: string,
   instrument?: InstrumentSlug,
-) => `${artistSlug}/${songSlug}/${instrument ?? 'cifra-group'}`;
+  version?: string,
+) => `${artistSlug}/${songSlug}/${instrument ?? 'cifra-group'}/${version ?? 'principal'}`;
 
 const openDatabase = (): Promise<IDBDatabase> =>
   new Promise((resolve, reject) => {

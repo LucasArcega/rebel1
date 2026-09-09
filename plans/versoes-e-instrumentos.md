@@ -27,26 +27,26 @@ Mesmo instrumento (`cifra-group`), URLs distintas pelo `label.slug`:
 
 ### Mudanças na API (`apps/api`)
 
-- [ ] Incluir `labelSlug` em `ChordVersion` (`principal`, `simplificada`, `original`)
-- [ ] Montar path com `label.slug` quando não for `principal`:
+- [x] Incluir `labelSlug` em `ChordVersion` (`principal`, `simplificada`, `original`)
+- [x] Montar path com `label.slug` quando não for `principal`:
   - `principal` → `/{artist}/{song}/`
   - `simplificada` → `/{artist}/{song}/simplificada/`
-- [ ] Aceitar query `?version=simplificada` em `GET /artists/:artist/songs/:song`
-- [ ] `buildFetchUrl` deve combinar `instrument` + `version` (label slug)
+- [x] Aceitar query `?version=simplificada` em `GET /artists/:artist/songs/:song`
+- [x] `buildFetchUrl` deve combinar `instrument` + `version` (label slug)
 
 ### Mudanças no frontend (`apps/web`)
 
-- [ ] Adicionar `version?: string` em `ChordSearchParams`
-- [ ] `VersionSelector`: navegar com `?version=simplificada` quando `labelSlug !== 'principal'`
-- [ ] `useChordQuery` / `chordRepository` / offline storage: chave inclui `version`
-- [ ] Badge ou label mostrando versão ativa (ex.: "Simplificada")
+- [x] Adicionar `version?: string` em `ChordSearchParams`
+- [x] `VersionSelector`: navegar com `?version=simplificada` quando `labelSlug !== 'principal'`
+- [x] `useChordQuery` / `chordRepository` / offline storage: chave inclui `version`
+- [x] Badge ou label mostrando versão ativa (ex.: "Simplificada")
 
 ### Testes
 
-- [ ] `coldplay/the-scientist` Principal → acordes `Dm7`, `Bb9`, `F`…
-- [ ] `coldplay/the-scientist` Simplificada → acordes `C#m`, `A`, `E`…
-- [ ] Troca no seletor altera conteúdo e `versionId`
-- [ ] Versão salva offline separadamente da Principal
+- [x] `coldplay/the-scientist` Principal → acordes `Dm7`, `Bb9`, `F`…
+- [x] `coldplay/the-scientist` Simplificada → acordes `C#m`, `A`, `E`…
+- [x] Troca no seletor altera conteúdo e `versionId`
+- [x] Versão salva offline separadamente da Principal
 
 ## Fase 2 — Outros instrumentos (letra, baixo, etc.)
 

@@ -13,7 +13,10 @@ export const chordRepository = {
   fetch: async (params: ChordSearchParams): Promise<ChordFetchResult> => {
     try {
       const response = await chordApi.getBySlug(params);
-      await offlineChordStorage.save(response.data, params.instrument);
+      await offlineChordStorage.save(response.data, {
+        instrument: params.instrument,
+        version: params.version,
+      });
       queryClient.invalidateQueries({ queryKey: offlineLibraryQueryKey });
 
       return {

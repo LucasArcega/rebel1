@@ -1,6 +1,22 @@
 import { Link } from 'react-router-dom';
+import type { OfflineChordRecord } from '@/shared/lib/offline-db';
 import { useOfflineLibrary } from '../model/use-offline-library';
 import { Spinner } from '@/shared/ui';
+
+const buildOfflineSongLink = (item: OfflineChordRecord) => {
+  const params = new URLSearchParams();
+
+  if (item.instrument !== 'cifra-group') {
+    params.set('instrument', item.instrument);
+  }
+
+  if (item.version !== 'principal') {
+    params.set('version', item.version);
+  }
+
+  const query = params.toString();
+  return `/artists/${item.artistSlug}/songs/${item.songSlug}${query ? `?${query}` : ''}`;
+};
 
 export const OfflineLibraryList = () => {
   const { items, isLoading, remove, isRemoving } = useOfflineLibrary();
@@ -21,9 +37,10 @@ export const OfflineLibraryList = () => {
     <ul className="offline-library">
       {items.map((item) => (
         <li key={item.id} className="offline-library__item">
-          <Link to={`/artists/${item.artistSlug}/songs/${item.songSlug}`}>
+          <Link to={buildOfflineSongLink(item)}>
             <strong>{item.chord.songName}</strong>
             <span>{item.chord.artistName}</span>
+            {item.version !== 'principal' && <span className="offline-library__version">{item.version}</span>}
             <small>
               Salva em {new Date(item.savedAt).toLocaleString('pt-BR')}
             </small>

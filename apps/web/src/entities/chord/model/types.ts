@@ -14,6 +14,7 @@ export type InstrumentSlug =
 export interface ChordVersion {
   id: number;
   label: string;
+  labelSlug: string;
   instrument: string;
   instrumentSlug: InstrumentSlug;
   path: string;
@@ -39,4 +40,5 @@ export interface ChordSearchParams {
   artist: string;
   song: string;
   instrument?: InstrumentSlug;
+  version?: string;
 }

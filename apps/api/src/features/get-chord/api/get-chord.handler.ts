@@ -20,8 +20,15 @@ export const getChord = async (params: {
   artist: string;
   song: string;
   instrument?: InstrumentSlug;
+  version?: string;
 }) => {
-  const url = buildFetchUrl(env.CIFRACLUB_BASE_URL, params.artist, params.song, params.instrument);
+  const url = buildFetchUrl(
+    env.CIFRACLUB_BASE_URL,
+    params.artist,
+    params.song,
+    params.instrument,
+    params.version,
+  );
 
   const response = await fetch(url, { headers: BROWSER_HEADERS });
 
@@ -34,7 +41,14 @@ export const getChord = async (params: {
   }
 
   const html = await response.text();
-  const parsed = parseCifraClubHtml(html, params.artist, params.song, env.CIFRACLUB_BASE_URL);
+  const parsed = parseCifraClubHtml(
+    html,
+    params.artist,
+    params.song,
+    env.CIFRACLUB_BASE_URL,
+    params.instrument ?? 'cifra-group',
+    params.version ?? 'principal',
+  );
 
   if (!parsed) {
     throw new ChordNotFoundError('Não foi possível extrair a cifra do HTML');

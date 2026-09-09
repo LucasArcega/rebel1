@@ -95,6 +95,19 @@ const extractJsonField = (text: string, field: string): string | null => {
   return text.match(pattern)?.[1] ?? null;
 };
 
+export const buildVersionPath = (
+  artistSlug: string,
+  songSlug: string,
+  instrumentSlug: InstrumentSlug,
+  labelSlug: string,
+): string => {
+  const instrumentSuffix = INSTRUMENT_PATHS[instrumentSlug] ?? '';
+  const versionSuffix =
+    instrumentSlug === 'cifra-group' && labelSlug !== 'principal' ? `/${labelSlug}` : '';
+
+  return `/${artistSlug}/${songSlug}${instrumentSuffix}${versionSuffix}/`;
+};
+
 const extractPriorityVersions = (text: string, artistSlug: string, songSlug: string): ChordVersion[] => {
   const start = text.indexOf('"priorityVersions":');
   if (start === -1) return [];
@@ -129,12 +142,12 @@ const extractPriorityVersions = (text: string, artistSlug: string, songSlug: str
     }>;
 
     return raw.map((version) => {
-      const suffix = INSTRUMENT_PATHS[version.instrument.slug] ?? '';
-      const path = `/${artistSlug}/${songSlug}${suffix}/`;
+      const path = buildVersionPath(artistSlug, songSlug, version.instrument.slug, version.label.slug);
 
       return {
         id: version.id,
         label: version.label.name,
+        labelSlug: version.label.slug,
         instrument: version.instrument.name,
         instrumentSlug: version.instrument.slug,
         path,
@@ -155,6 +168,8 @@ export const parseCifraClubHtml = (
   artistSlug: string,
   songSlug: string,
   cifraclubBaseUrl: string,
+  instrument: InstrumentSlug = 'cifra-group',
+  version = 'principal',
 ): ChordSong | null => {
   const chunks = extractRscChunks(html);
   const songChunk = chunks.find((chunk) => chunk.includes('"songData"') && chunk.includes('"priorityVersions"'));
@@ -195,7 +210,7 @@ export const parseCifraClubHtml = (
     composers,
     hits,
     youtubeId: extractYoutubeId(html),
-    cifraclubUrl: `${cifraclubBaseUrl}/${artistSlug}/${songSlug}/`,
+    cifraclubUrl: `${cifraclubBaseUrl}${buildVersionPath(artistSlug, songSlug, instrument, version)}`,
     content,
     versions,
   };
@@ -206,7 +221,10 @@ export const buildFetchUrl = (
   artistSlug: string,
   songSlug: string,
   instrument?: InstrumentSlug,
+  version?: string,
 ): string => {
-  const suffix = instrument ? INSTRUMENT_PATHS[instrument] ?? '' : '';
-  return `${baseUrl}/${artistSlug}/${songSlug}${suffix}/`;
+  const instrumentSlug = instrument ?? 'cifra-group';
+  const labelSlug = version ?? 'principal';
+
+  return `${baseUrl}${buildVersionPath(artistSlug, songSlug, instrumentSlug, labelSlug)}`;
 };

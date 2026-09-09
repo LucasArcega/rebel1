@@ -9,12 +9,18 @@ interface ChordViewerProps {
   source?: ChordFetchResult['source'];
 }
 
-export const ChordViewer = ({ chord, source }: ChordViewerProps) => (
+export const ChordViewer = ({ chord, source }: ChordViewerProps) => {
+  const activeVersion = chord.versions.find((version) => version.id === chord.versionId);
+
+  return (
   <section className="chord-viewer">
     <header className="chord-viewer__header">
       <div>
         <p className="chord-viewer__artist">{chord.artistName}</p>
         <h1 className="chord-viewer__title">{chord.songName}</h1>
+        {activeVersion && activeVersion.labelSlug !== 'principal' && (
+          <span className="version-badge">{activeVersion.label}</span>
+        )}
       </div>
       {source === 'offline' && <span className="offline-badge">Offline</span>}
       {source === 'network' && <span className="saved-badge">Salva offline</span>}
@@ -30,4 +36,5 @@ export const ChordViewer = ({ chord, source }: ChordViewerProps) => (
     <ChordMeta chord={chord} />
     <ChordContent content={chord.content} />
   </section>
-);
+  );
+};

@@ -1,18 +1,21 @@
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useChordQuery } from '@/features/fetch-chord';
-import { parseInstrumentFromSearch } from '@/features/select-version';
+import { parseInstrumentFromSearch, parseVersionFromSearch } from '@/features/select-version';
 import { Spinner } from '@/shared/ui';
 import { ChordViewer } from '@/widgets/chord-viewer';
 
 export const SongPage = () => {
   const { artist = '', song = '' } = useParams();
   const [searchParams] = useSearchParams();
-  const instrument = parseInstrumentFromSearch(searchParams.toString());
+  const search = searchParams.toString();
+  const instrument = parseInstrumentFromSearch(search);
+  const version = parseVersionFromSearch(search);
 
   const { data, isLoading, isError, error } = useChordQuery({
     artist,
     song,
     instrument,
+    version,
   });
 
   const chord = data?.chord;

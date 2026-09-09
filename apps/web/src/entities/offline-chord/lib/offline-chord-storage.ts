@@ -6,13 +6,14 @@ import {
 } from '@/shared/lib/offline-db';
 
 export const offlineChordStorage = {
-  save: async (chord: ChordSong, instrument?: ChordSearchParams['instrument']) => {
-    const id = buildOfflineChordId(chord.artistSlug, chord.songSlug, instrument);
+  save: async (chord: ChordSong, params: Pick<ChordSearchParams, 'instrument' | 'version'>) => {
+    const id = buildOfflineChordId(chord.artistSlug, chord.songSlug, params.instrument, params.version);
     const record: OfflineChordRecord = {
       id,
       artistSlug: chord.artistSlug,
       songSlug: chord.songSlug,
-      instrument: instrument ?? 'cifra-group',
+      instrument: params.instrument ?? 'cifra-group',
+      version: params.version ?? 'principal',
       savedAt: new Date().toISOString(),
       chord,
     };
@@ -22,7 +23,7 @@ export const offlineChordStorage = {
   },
 
   get: async (params: ChordSearchParams) => {
-    const id = buildOfflineChordId(params.artist, params.song, params.instrument);
+    const id = buildOfflineChordId(params.artist, params.song, params.instrument, params.version);
     const record = await offlineDb.get(id);
     return record?.chord ?? null;
   },

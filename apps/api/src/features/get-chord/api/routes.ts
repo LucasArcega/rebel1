@@ -19,6 +19,7 @@ const instrumentSchema = z.enum([
 
 const querySchema = z.object({
   instrument: instrumentSchema.optional(),
+  version: z.string().min(1).optional(),
 });
 
 export const chordRoutes = new Hono();
@@ -31,6 +32,7 @@ chordRoutes.get('/artists/:artist/songs/:song', async (c) => {
 
   const parsedQuery = querySchema.safeParse({
     instrument: c.req.query('instrument'),
+    version: c.req.query('version'),
   });
 
   if (!parsedQuery.success) {
@@ -42,6 +44,7 @@ chordRoutes.get('/artists/:artist/songs/:song', async (c) => {
       artist,
       song,
       instrument: parsedQuery.data.instrument as InstrumentSlug | undefined,
+      version: parsedQuery.data.version,
     });
 
     return c.json({ data: chord });
