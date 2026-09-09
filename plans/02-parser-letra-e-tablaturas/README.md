@@ -1,6 +1,6 @@
 # Plano 02: parser — letra e tablaturas
 
-**Status:** Planejado
+**Status:** Implementado
 **Dependências:** nenhuma
 
 ## Contexto

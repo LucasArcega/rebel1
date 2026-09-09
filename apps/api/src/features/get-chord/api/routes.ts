@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { z } from 'zod';
 import type { InstrumentSlug } from '../../../entities/chord/model/types.js';
-import { ChordNotFoundError, getChord } from './get-chord.handler.js';
+import { ChordRequestError, getChord } from './get-chord.handler.js';
 
 const instrumentSchema = z.enum([
   'cifra-group',
@@ -49,11 +49,12 @@ chordRoutes.get('/artists/:artist/songs/:song', async (c) => {
 
     return c.json({ data: chord });
   } catch (error) {
-    if (error instanceof ChordNotFoundError) {
-      return c.json({ error: error.message }, 404);
+    if (error instanceof ChordRequestError) {
+      const status = error.code === 'FETCH_FAILED' ? 502 : 404;
+      return c.json({ error: error.message, code: error.code }, status);
     }
 
     console.error(error);
-    return c.json({ error: 'Erro interno ao buscar cifra' }, 500);
+    return c.json({ error: 'Erro interno ao buscar cifra', code: 'FETCH_FAILED' }, 500);
   }
 });

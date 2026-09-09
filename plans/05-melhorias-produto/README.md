@@ -1,6 +1,6 @@
 # Plano 05: melhorias de produto
 
-**Status:** Planejado
+**Status:** Parcial (5a implementado)
 **Dependências:** 02 estável (para transposição em tablaturas)
 
 ## Contexto

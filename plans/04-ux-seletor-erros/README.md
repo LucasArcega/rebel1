@@ -1,6 +1,6 @@
 # Plano 04: UX — seletor e erros
 
-**Status:** Planejado
+**Status:** Implementado
 **Dependências:** 02 (parser), 03 (teclado, parcial)
 
 ## Contexto

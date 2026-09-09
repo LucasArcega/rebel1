@@ -1,4 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
+import { SearchChordForm } from '@/features/search-chord';
 import { SearchResultsList, useSearchQuery } from '@/features/search-results';
 
 export const SearchPage = () => {
@@ -10,9 +11,17 @@ export const SearchPage = () => {
   return (
     <div className="page">
       <header className="page-header">
-        <h1>Resultados</h1>
-        {query && <p className="page-header__subtitle">Buscando por &quot;{query}&quot;</p>}
+        <h1>Busca</h1>
+        {query && (
+          <p className="page-header__subtitle">
+            {isLoading
+              ? `Buscando por "${query}"…`
+              : `${data?.length ?? 0} resultado(s) para "${query}"`}
+          </p>
+        )}
       </header>
+
+      <SearchChordForm />
 
       <SearchResultsList
         query={query}

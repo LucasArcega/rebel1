@@ -9,9 +9,22 @@ const BROWSER_HEADERS = {
   'Accept-Language': 'pt-BR,pt;q=0.9',
 };
 
-export class ChordNotFoundError extends Error {
-  constructor(message = 'Cifra não encontrada') {
+export type ChordErrorCode = 'NOT_FOUND_ON_CC' | 'PARSE_FAILED' | 'FETCH_FAILED';
+
+export class ChordRequestError extends Error {
+  readonly code: ChordErrorCode;
+
+  constructor(code: ChordErrorCode, message: string) {
     super(message);
+    this.name = 'ChordRequestError';
+    this.code = code;
+  }
+}
+
+/** @deprecated Use ChordRequestError */
+export class ChordNotFoundError extends ChordRequestError {
+  constructor(message = 'Cifra não encontrada') {
+    super('NOT_FOUND_ON_CC', message);
     this.name = 'ChordNotFoundError';
   }
 }
@@ -33,11 +46,11 @@ export const getChord = async (params: {
   const response = await fetch(url, { headers: BROWSER_HEADERS });
 
   if (response.status === 404) {
-    throw new ChordNotFoundError();
+    throw new ChordRequestError('NOT_FOUND_ON_CC', 'Transcrição não disponível no Cifra Club');
   }
 
   if (!response.ok) {
-    throw new Error(`Falha ao buscar cifra: ${response.status}`);
+    throw new ChordRequestError('FETCH_FAILED', `Falha ao buscar cifra: ${response.status}`);
   }
 
   const html = await response.text();
@@ -51,7 +64,10 @@ export const getChord = async (params: {
   );
 
   if (!parsed) {
-    throw new ChordNotFoundError('Não foi possível extrair a cifra do HTML');
+    throw new ChordRequestError(
+      'PARSE_FAILED',
+      'Este instrumento ou versão ainda não é suportado pelo parser',
+    );
   }
 
   return parsed;

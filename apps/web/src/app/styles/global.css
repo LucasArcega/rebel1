@@ -340,6 +340,83 @@ a:hover {
   color: var(--accent);
 }
 
+.chord-transpose {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  align-items: flex-end;
+  padding: 0.85rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.chord-transpose__group {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.chord-transpose__label {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.chord-transpose__buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chord-transpose__btn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+
+.chord-transpose__value {
+  min-width: 2.5rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.chord-transpose__select {
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  padding: 0.45rem 0.6rem;
+  font: inherit;
+}
+
+.chord-transpose__summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.chord-transpose__reset {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--accent);
+  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+.chord-meta__original-tone {
+  color: var(--muted);
+  margin-left: 0.35rem;
+}
+
 .chord-meta {
   display: grid;
   gap: 0.5rem;

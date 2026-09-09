@@ -2,12 +2,20 @@ import type { ChordSong } from '@/entities/chord';
 
 interface ChordMetaProps {
   chord: ChordSong;
+  displayTone?: string | null;
+  capoFret?: number;
 }
 
-export const ChordMeta = ({ chord }: ChordMetaProps) => (
+export const ChordMeta = ({ chord, displayTone, capoFret = 0 }: ChordMetaProps) => (
   <div className="chord-meta">
     <div className="chord-meta__row">
-      <span>Tom: {chord.tone ?? '—'}</span>
+      <span>
+        Tom: {displayTone ?? chord.tone ?? '—'}
+        {displayTone && chord.tone && displayTone !== chord.tone && (
+          <small className="chord-meta__original-tone"> (original: {chord.tone})</small>
+        )}
+      </span>
+      {capoFret > 0 && <span>Capotraste: casa {capoFret}</span>}
       {chord.tuning && <span>Afinação: {chord.tuning}</span>}
       {chord.hits && <span>{chord.hits.toLocaleString('pt-BR')} visualizações</span>}
     </div>

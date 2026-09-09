@@ -14,6 +14,9 @@ const INSTRUMENT_PATHS: Record<string, string> = {
   guitarpro: '/guitarpro',
 };
 
+const TAB_LINE_PATTERN = /^[EADGB]\|/m;
+const CHUNK_STOP_MARKERS = ['","metadata"', '"/t', '"\\n"]', '</pre>'];
+
 const decodeRscChunk = (chunk: string): string =>
   chunk
     .replace(/\\n/g, '\n')
@@ -41,6 +44,113 @@ const stripChordHtml = (value: string): string =>
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>');
 
+const sliceUntilMarkers = (chunk: string, start: number): string => {
+  let end = chunk.length;
+
+  for (const stop of CHUNK_STOP_MARKERS) {
+    const idx = chunk.indexOf(stop, start);
+    if (idx !== -1) end = Math.min(end, idx);
+  }
+
+  return chunk.slice(start, end).trim();
+};
+
+const unescapeJsonString = (value: string): string =>
+  value
+    .replace(/\\n/g, '\n')
+    .replace(/\\r/g, '\r')
+    .replace(/\\t/g, '\t')
+    .replace(/\\"/g, '"')
+    .replace(/\\\\/g, '\\');
+
+const extractJsonStringField = (chunk: string, field: string): string | null => {
+  const marker = `"${field}":"`;
+  const start = chunk.indexOf(marker);
+  if (start === -1) return null;
+
+  let index = start + marker.length;
+  let result = '';
+
+  while (index < chunk.length) {
+    const char = chunk[index];
+
+    if (char === '\\' && index + 1 < chunk.length) {
+      const next = chunk[index + 1];
+      if (next === 'n') {
+        result += '\n';
+        index += 2;
+        continue;
+      }
+      if (next === 'r') {
+        result += '\r';
+        index += 2;
+        continue;
+      }
+      if (next === 't') {
+        result += '\t';
+        index += 2;
+        continue;
+      }
+      if (next === '"') {
+        result += '"';
+        index += 2;
+        continue;
+      }
+      if (next === '\\') {
+        result += '\\';
+        index += 2;
+        continue;
+      }
+      result += char;
+      index += 1;
+      continue;
+    }
+
+    if (char === '"') break;
+
+    result += char;
+    index += 1;
+  }
+
+  return result || null;
+};
+
+const normalizeLyricsText = (raw: string) =>
+  unescapeJsonString(raw).replace(/\\\n/g, '\n').trim();
+
+const isLikelyLyricsContent = (value: string) =>
+  value.length > 30 && !value.includes('<') && !value.includes('device-width');
+
+const extractLyricsFromSection = (section: string): string | null => {
+  const contentMarker = section.indexOf('"content":"');
+  if (contentMarker === -1) return null;
+
+  const raw = extractJsonStringField(section.slice(contentMarker), 'content');
+  if (!raw || !isLikelyLyricsContent(raw)) return null;
+
+  return normalizeLyricsText(raw);
+};
+
+const extractLyricsContent = (chunks: string[]): string | null => {
+  for (const chunk of chunks) {
+    const initialMarker = chunk.indexOf('"initialSong"');
+    if (initialMarker !== -1) {
+      const lyrics = extractLyricsFromSection(chunk.slice(initialMarker));
+      if (lyrics) return lyrics;
+    }
+  }
+
+  for (const chunk of chunks) {
+    const songDataMarker = chunk.indexOf('"songData"');
+    if (songDataMarker === -1) continue;
+
+    const lyrics = extractLyricsFromSection(chunk.slice(songDataMarker));
+    if (lyrics) return lyrics;
+  }
+
+  return null;
+};
+
 const extractTablatureContent = (chunk: string): string | null => {
   if (!chunk.includes('#t1#') || !chunk.includes('|')) return null;
 
@@ -48,13 +158,22 @@ const extractTablatureContent = (chunk: string): string | null => {
   const start = chunk.indexOf('E|', marker);
   if (start === -1) return null;
 
-  let end = chunk.length;
-  for (const stop of ['","metadata"', '"/t', '"\\n"]']) {
-    const idx = chunk.indexOf(stop, start);
-    if (idx !== -1) end = Math.min(end, idx);
-  }
+  return sliceUntilMarkers(chunk, start);
+};
 
-  return chunk.slice(start, end).trim();
+const extractGenericTablatureContent = (chunk: string): string | null => {
+  if (!TAB_LINE_PATTERN.test(chunk)) return null;
+
+  const match = chunk.match(/^(?:Intro|Vers[oõ]|Refr[aã]o|\d+:\d+)?\s*\n?[EADGB]\|/m);
+  const start = match?.index ?? chunk.search(/[EADGB]\|/);
+  if (start === -1) return null;
+
+  const slice = sliceUntilMarkers(chunk, start);
+  const tabLines = slice.split('\n').filter((line) => /^[EADGB]\|/.test(line) || line.trim() === '' || /^\d+:\d+$/.test(line.trim()) || /^(Intro|Verso|Refrão)/i.test(line.trim()));
+
+  if (tabLines.filter((line) => /^[EADGB]\|/.test(line)).length < 2) return null;
+
+  return tabLines.join('\n').trim();
 };
 
 const extractLyricChordContent = (chunk: string): string | null => {
@@ -64,27 +183,36 @@ const extractLyricChordContent = (chunk: string): string | null => {
   if (sectionStart === -1) return null;
 
   const tuningMatch = chunk.slice(0, sectionStart).match(/Afin[a-zA-ZçãõÇÃÕ: ]+/i);
-
-  let end = chunk.length;
-  for (const stop of ['","metadata"', '"/t', '"\\n"]', '</pre>']) {
-    const idx = chunk.indexOf(stop, sectionStart);
-    if (idx !== -1) end = Math.min(end, idx);
-  }
-
-  const body = stripChordHtml(chunk.slice(sectionStart, end).trim());
+  const body = stripChordHtml(sliceUntilMarkers(chunk, sectionStart));
   const tuning = tuningMatch ? stripChordHtml(tuningMatch[0]).trim() : null;
+
   return tuning ? `${tuning}\n\n${body}` : body;
 };
 
-const extractChordContent = (chunks: string[]): string | null => {
+const extractChordContent = (chunks: string[], instrument: InstrumentSlug): string | null => {
+  if (instrument === 'lyrics') {
+    const lyrics = extractLyricsContent(chunks);
+    if (lyrics) return lyrics;
+  }
+
   for (const chunk of chunks) {
     const tablature = extractTablatureContent(chunk);
     if (tablature) return tablature;
   }
 
   for (const chunk of chunks) {
+    const genericTab = extractGenericTablatureContent(chunk);
+    if (genericTab) return genericTab;
+  }
+
+  for (const chunk of chunks) {
     const lyricChord = extractLyricChordContent(chunk);
     if (lyricChord) return lyricChord;
+  }
+
+  if (instrument !== 'lyrics') {
+    const fallbackLyrics = extractLyricsContent(chunks);
+    if (fallbackLyrics) return fallbackLyrics;
   }
 
   return null;
@@ -132,10 +260,8 @@ const extractPriorityVersions = (text: string, artistSlug: string, songSlug: str
 
   if (arrayEnd === -1) return [];
 
-  const match = [text.slice(arrayStart, arrayEnd + 1)];
-
   try {
-    const raw = JSON.parse(match[0]) as Array<{
+    const raw = JSON.parse(text.slice(arrayStart, arrayEnd + 1)) as Array<{
       id: number;
       instrument: { slug: InstrumentSlug; name: string };
       label: { name: string; slug: string };
@@ -194,7 +320,7 @@ export const parseCifraClubHtml = (
   const composersMatch = songChunk.match(/"composers"\s*:\s*(\[[^\]]+\])/);
   const composers = composersMatch ? (JSON.parse(composersMatch[1]) as string[]) : [];
 
-  const content = extractChordContent(chunks);
+  const content = extractChordContent(chunks, instrument);
   if (!content) return null;
 
   const versions = extractPriorityVersions(songChunk, artistSlug, songSlug);
