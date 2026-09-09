@@ -1,4 +1,5 @@
-:root {
+:root,
+[data-theme='dark'] {
   color-scheme: dark;
   --bg: #0f1115;
   --surface: #171a21;
@@ -14,6 +15,20 @@
   font-family: Inter, system-ui, sans-serif;
   background: radial-gradient(circle at top, #1a2030 0%, var(--bg) 45%);
   color: var(--text);
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f3f4f6;
+  --surface: #ffffff;
+  --surface-2: #eef1f6;
+  --border: #d5dbe7;
+  --text: #111827;
+  --muted: #5b6577;
+  --accent: #e56a00;
+  --accent-hover: #c95a00;
+  --shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  background: linear-gradient(180deg, #ffffff 0%, var(--bg) 100%);
 }
 
 * {
@@ -435,6 +450,105 @@ a:hover {
   gap: 1rem;
 }
 
+.chord-viewer__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.chord-tools {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.save-chord-btn,
+.auto-scroll__btn,
+.chord-display-controls__btn {
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+.auto-scroll,
+.chord-display-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.auto-scroll__label,
+.chord-display-controls__group {
+  font-size: 0.8rem;
+  color: var(--muted);
+  display: grid;
+  gap: 0.25rem;
+}
+
+.auto-scroll__speed input {
+  width: 120px;
+}
+
+.chord-display-controls select {
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  padding: 0.35rem 0.5rem;
+  font: inherit;
+}
+
+.search-history {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.search-history__label {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.search-history__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.search-history__chip {
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
+.app-nav__count {
+  display: inline-flex;
+  min-width: 1.25rem;
+  justify-content: center;
+  padding: 0.1rem 0.35rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #111;
+  font-size: 0.75rem;
+  margin-left: 0.25rem;
+}
+
+.version-chip--disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .chord-content {
   margin: 0;
   padding: 1rem;
@@ -442,10 +556,27 @@ a:hover {
   background: #0b0d11;
   border: 1px solid var(--border);
   overflow: auto;
+  max-height: 70vh;
   white-space: pre-wrap;
   font-family: 'Roboto Mono', monospace;
   font-size: 0.82rem;
   line-height: 1.45;
+}
+
+[data-theme='light'] .chord-content {
+  background: #f8fafc;
+}
+
+.chord-content--sm {
+  font-size: 0.72rem;
+}
+
+.chord-content--md {
+  font-size: 0.82rem;
+}
+
+.chord-content--lg {
+  font-size: 0.95rem;
 }
 
 .spinner {
@@ -465,6 +596,25 @@ a:hover {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media print {
+  .app-header,
+  .chord-tools,
+  .version-selector,
+  .chord-meta__links,
+  .save-chord-btn,
+  .offline-badge,
+  .saved-badge {
+    display: none !important;
+  }
+
+  .chord-content {
+    max-height: none;
+    border: none;
+    background: white;
+    color: black;
   }
 }
 

@@ -70,7 +70,7 @@ export const SongPage = () => {
 
   return (
     <div className="page">
-      <ChordViewer chord={chord} source={source} />
+      <ChordViewer chord={chord} source={source} fetchParams={{ instrument, version }} />
     </div>
   );
 };

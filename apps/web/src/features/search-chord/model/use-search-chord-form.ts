@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { searchHistoryStorage } from '@/shared/lib/search-history';
 
 export const useSearchChordForm = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export const useSearchChordForm = () => {
     const trimmed = query.trim();
     if (trimmed.length < 2) return;
 
+    searchHistoryStorage.add(trimmed);
     navigate(`/search?q=${encodeURIComponent(trimmed)}`);
   };
 
@@ -24,5 +26,6 @@ export const useSearchChordForm = () => {
     query,
     setQuery,
     submit,
+    history: searchHistoryStorage.list(),
   };
 };

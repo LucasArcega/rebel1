@@ -1,4 +1,4 @@
-import type { ChordVersion } from '@/entities/chord';
+import { getVersionSupportLabel, isVersionSelectable, type ChordVersion } from '@/entities/chord';
 import { useVersionNavigation } from '../model/use-version-navigation';
 
 interface VersionSelectorProps {
@@ -22,16 +22,23 @@ export const VersionSelector = ({
     <div className="version-selector">
       <span className="version-selector__label">Versões</span>
       <div className="version-selector__list">
-        {versions.map((version) => (
-          <button
-            key={version.id}
-            type="button"
-            className={`version-chip ${version.id === activeVersionId ? 'version-chip--active' : ''}`}
-            onClick={() => selectVersion(version)}
-          >
-            {version.instrument} · {version.label}
-          </button>
-        ))}
+        {versions.map((version) => {
+          const selectable = isVersionSelectable(version);
+          const supportLabel = getVersionSupportLabel(version);
+
+          return (
+            <button
+              key={version.id}
+              type="button"
+              disabled={!selectable}
+              title={supportLabel}
+              className={`version-chip ${version.id === activeVersionId ? 'version-chip--active' : ''} ${selectable ? '' : 'version-chip--disabled'}`}
+              onClick={() => selectVersion(version)}
+            >
+              {version.instrument} · {version.label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

@@ -9,10 +9,10 @@ O `VersionSelector` lista entradas de `priorityVersions`, mas várias quebram (l
 
 ## Critérios de aceite
 
-- [ ] API retorna `error.code` distinguindo `PARSE_FAILED` vs `NOT_FOUND_ON_CC`
-- [ ] Frontend mostra mensagens específicas por tipo de erro
-- [ ] Itens não suportados desabilitados ou ocultos no seletor
-- [ ] Offline com cache continua funcionando
+- [x] API retorna `error.code` distinguindo `PARSE_FAILED` vs `NOT_FOUND_ON_CC`
+- [x] Frontend mostra mensagens específicas por tipo de erro
+- [ ] Itens não suportados desabilitados ou ocultos no seletor (erros claros no lugar)
+- [x] Offline com cache continua funcionando
 
 ## Fora do escopo
 

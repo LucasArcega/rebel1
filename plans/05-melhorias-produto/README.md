@@ -13,9 +13,10 @@ Implementar em tickets/planos filhos ou fases incrementais:
 
 ### 5a — Transposição (prioridade 1)
 
-- [ ] UI para subir/descer semitons
-- [ ] Transposição aplicada no conteúdo exibido (cifra com acordes)
-- [ ] Versão offline salva sem alterar tom original
+- [x] UI para subir/descer semitons
+- [x] Transposição aplicada no conteúdo exibido (cifra com acordes)
+- [x] Versão offline salva sem alterar tom original
+- [x] Capotraste (casas 0–11) com transposição efetiva
 
 ### 5b — Auto-scroll
 

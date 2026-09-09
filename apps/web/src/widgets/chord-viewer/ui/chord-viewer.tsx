@@ -1,5 +1,8 @@
-import type { ChordSong } from '@/entities/chord';
+import type { ChordSearchParams, ChordSong } from '@/entities/chord';
 import type { ChordFetchResult } from '@/features/fetch-chord';
+import { AutoScrollControls, useAutoScroll } from '@/features/auto-scroll-chord';
+import { ChordDisplayControls, useChordDisplaySettings } from '@/features/chord-display';
+import { SaveChordButton } from '@/features/save-chord-offline';
 import { ChordTransposeControls, useChordTranspose } from '@/features/transpose-chord';
 import { VersionSelector } from '@/features/select-version';
 import { ChordContent } from './chord-content';
@@ -8,11 +11,14 @@ import { ChordMeta } from './chord-meta';
 interface ChordViewerProps {
   chord: ChordSong;
   source?: ChordFetchResult['source'];
+  fetchParams: Pick<ChordSearchParams, 'instrument' | 'version'>;
 }
 
-export const ChordViewer = ({ chord, source }: ChordViewerProps) => {
+export const ChordViewer = ({ chord, source, fetchParams }: ChordViewerProps) => {
   const activeVersion = chord.versions.find((version) => version.id === chord.versionId);
   const transpose = useChordTranspose(chord);
+  const autoScroll = useAutoScroll();
+  const display = useChordDisplaySettings();
 
   return (
     <section className="chord-viewer">
@@ -24,8 +30,11 @@ export const ChordViewer = ({ chord, source }: ChordViewerProps) => {
             <span className="version-badge">{activeVersion.label}</span>
           )}
         </div>
-        {source === 'offline' && <span className="offline-badge">Offline</span>}
-        {source === 'network' && <span className="saved-badge">Salva offline</span>}
+        <div className="chord-viewer__badges">
+          {source === 'offline' && <span className="offline-badge">Offline</span>}
+          {source === 'network' && <span className="saved-badge">Salva offline</span>}
+          <SaveChordButton chord={chord} params={fetchParams} />
+        </div>
       </header>
 
       <VersionSelector
@@ -35,20 +44,39 @@ export const ChordViewer = ({ chord, source }: ChordViewerProps) => {
         activeVersionId={chord.versionId}
       />
 
-      {transpose.canTranspose && (
-        <ChordTransposeControls
-          manualSemitones={transpose.manualSemitones}
-          capoFret={transpose.capoFret}
-          effectiveSemitones={transpose.effectiveSemitones}
-          onIncrease={transpose.increase}
-          onDecrease={transpose.decrease}
-          onCapoChange={transpose.setCapoFret}
-          onReset={transpose.reset}
+      <div className="chord-tools">
+        {transpose.canTranspose && (
+          <ChordTransposeControls
+            manualSemitones={transpose.manualSemitones}
+            capoFret={transpose.capoFret}
+            effectiveSemitones={transpose.effectiveSemitones}
+            onIncrease={transpose.increase}
+            onDecrease={transpose.decrease}
+            onCapoChange={transpose.setCapoFret}
+            onReset={transpose.reset}
+          />
+        )}
+        <AutoScrollControls
+          isPlaying={autoScroll.isPlaying}
+          speed={autoScroll.speed}
+          onToggle={autoScroll.toggle}
+          onSpeedChange={autoScroll.setSpeed}
         />
-      )}
+        <ChordDisplayControls
+          fontSize={display.fontSize}
+          theme={display.theme}
+          onFontSizeChange={display.setFontSize}
+          onToggleTheme={display.toggleTheme}
+          onPrint={display.printChord}
+        />
+      </div>
 
       <ChordMeta chord={chord} displayTone={transpose.displayTone} capoFret={transpose.capoFret} />
-      <ChordContent content={transpose.displayContent} />
+      <ChordContent
+        content={transpose.displayContent}
+        contentRef={autoScroll.contentRef}
+        fontSize={display.fontSize}
+      />
     </section>
   );
 };

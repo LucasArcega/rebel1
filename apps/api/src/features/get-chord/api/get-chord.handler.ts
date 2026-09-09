@@ -64,6 +64,9 @@ export const getChord = async (params: {
   );
 
   if (!parsed) {
+    console.warn(
+      `[parser] PARSE_FAILED artist=${params.artist} song=${params.song} instrument=${params.instrument ?? 'cifra-group'} version=${params.version ?? 'principal'}`,
+    );
     throw new ChordRequestError(
       'PARSE_FAILED',
       'Este instrumento ou versão ainda não é suportado pelo parser',

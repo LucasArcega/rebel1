@@ -9,10 +9,10 @@ A API extrai conteúdo dos chunks SSR do Cifra Club. O parser cobre cifra com ac
 
 ## Critérios de aceite
 
-- [ ] `?instrument=lyrics` retorna letra para músicas com `/letra/` no CC
-- [ ] `?instrument=bass` retorna tablatura de baixo (`G|`, `D|`, `A|`)
-- [ ] Bateria/gaita existentes continuam funcionando (formato `E|`)
-- [ ] Testes curl dos 3 casos documentados em MANUAL.md passam
+- [x] `?instrument=lyrics` retorna letra para músicas com `/letra/` no CC
+- [x] `?instrument=bass` retorna tablatura de baixo (`G|`, `D|`, `A|`)
+- [x] Bateria/gaita existentes continuam funcionando (formato `E|`)
+- [x] Testes curl dos 3 casos documentados em MANUAL.md passam
 
 ## Fora do escopo
 
