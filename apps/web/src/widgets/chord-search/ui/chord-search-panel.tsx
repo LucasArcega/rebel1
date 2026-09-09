@@ -4,7 +4,7 @@ export const ChordSearchPanel = () => (
   <section className="search-panel">
     <h2>Buscar cifra</h2>
     <p className="search-panel__hint">
-      Use os slugs do Cifra Club (ex.: <code>avenged-sevenfold</code> / <code>buried-alive--</code>).
+      Digite o nome do artista, da música ou ambos. Ex.: <code>Avenged Sevenfold Buried Alive</code>.
     </p>
     <SearchChordForm />
   </section>

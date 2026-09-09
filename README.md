@@ -34,16 +34,22 @@ npm run dev:web   # http://localhost:5173
 ## API
 
 ```
+GET /api/search?q=avenged sevenfold buried alive
 GET /api/artists/:artist/songs/:song
 GET /api/artists/:artist/songs/:song?instrument=bass
 ```
 
-Exemplo:
+## Offline
 
-```bash
-curl http://localhost:3001/api/artists/avenged-sevenfold/songs/buried-alive--
-```
+Toda cifra aberta online é salva automaticamente no **IndexedDB** do navegador. Se a rede falhar, o app tenta carregar a versão salva.
 
-## Exemplo de rota no app
+- Home e `/library` listam as cifras salvas
+- Badge **Offline** quando veio do dispositivo
+- Badge **Salva offline** quando acabou de baixar
 
-`/artists/avenged-sevenfold/songs/buried-alive--`
+## Rotas do app
+
+- `/` — busca por nome
+- `/search?q=...` — resultados
+- `/library` — cifras salvas
+- `/artists/:artist/songs/:song` — visualizar cifra

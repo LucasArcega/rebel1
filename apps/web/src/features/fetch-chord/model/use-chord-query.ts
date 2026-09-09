@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { chordApi, type ChordSearchParams } from '@/entities/chord';
+import type { ChordSearchParams } from '@/entities/chord';
+import { chordRepository } from './chord-repository';
 
 export const chordQueryKey = (params: ChordSearchParams) => ['chord', params];
 
 export const useChordQuery = (params: ChordSearchParams) =>
   useQuery({
     queryKey: chordQueryKey(params),
-    queryFn: () => chordApi.getBySlug(params),
-    select: (response) => response.data,
+    queryFn: () => chordRepository.fetch(params),
     enabled: Boolean(params.artist && params.song),
   });

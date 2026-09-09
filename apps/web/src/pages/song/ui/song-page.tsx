@@ -15,6 +15,9 @@ export const SongPage = () => {
     instrument,
   });
 
+  const chord = data?.chord;
+  const source = data?.source;
+
   if (isLoading) {
     return (
       <div className="page page--centered">
@@ -23,12 +26,15 @@ export const SongPage = () => {
     );
   }
 
-  if (isError || !data) {
+  if (isError || !chord) {
     return (
       <div className="page">
         <div className="error-state">
           <h2>Não foi possível carregar a cifra</h2>
           <p>{error?.message ?? 'Erro desconhecido'}</p>
+          <p className="error-state__hint">
+            Se você já abriu essa música antes, ela pode estar na biblioteca offline.
+          </p>
         </div>
       </div>
     );
@@ -36,7 +42,7 @@ export const SongPage = () => {
 
   return (
     <div className="page">
-      <ChordViewer chord={data} />
+      <ChordViewer chord={chord} source={source} />
     </div>
   );
 };

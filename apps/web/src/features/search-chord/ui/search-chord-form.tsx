@@ -2,31 +2,22 @@ import { Button, Input } from '@/shared/ui';
 import { useSearchChordForm } from '../model/use-search-chord-form';
 
 export const SearchChordForm = () => {
-  const { artist, song, setArtist, setSong, submit } = useSearchChordForm();
+  const { query, setQuery, submit } = useSearchChordForm();
 
   return (
     <form className="search-form" onSubmit={submit}>
       <label className="field">
-        <span>Artista (slug)</span>
+        <span>Artista, música ou os dois</span>
         <Input
-          value={artist}
-          onChange={(event) => setArtist(event.target.value)}
-          placeholder="avenged-sevenfold"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Ex.: Avenged Sevenfold Buried Alive"
           required
+          minLength={2}
         />
       </label>
 
-      <label className="field">
-        <span>Música (slug)</span>
-        <Input
-          value={song}
-          onChange={(event) => setSong(event.target.value)}
-          placeholder="buried-alive--"
-          required
-        />
-      </label>
-
-      <Button type="submit">Buscar cifra</Button>
+      <Button type="submit">Buscar</Button>
     </form>
   );
 };

@@ -2,6 +2,7 @@ import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { chordRoutes } from './features/get-chord/api/routes.js';
+import { searchRoutes } from './features/search-chords/api/routes.js';
 import { env } from './shared/config/env.js';
 
 const app = new Hono();
@@ -14,6 +15,7 @@ app.use(
 );
 
 app.route('/api', chordRoutes);
+app.route('/api', searchRoutes);
 
 serve(
   {
