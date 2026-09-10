@@ -2,6 +2,8 @@
 
 Monorepo React + API para consumir cifras do Cifra Club com arquitetura **FSD (Feature-Sliced Design)** + **Bulletproof**.
 
+Consulte o [guia de arquitetura](./ARCHITECTURE_GUIDE.md) antes de criar ou reorganizar módulos.
+
 ## Estrutura
 
 ```
