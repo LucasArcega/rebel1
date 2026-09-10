@@ -1,6 +1,6 @@
 # Status dos planos — Cifra Hub
 
-Índice global. **Todos os planos finalizados.**
+Índice global dos planos implementados, parciais e planejados.
 
 | NN | Plano | Status | Branch |
 |----|-------|--------|--------|
@@ -11,10 +11,13 @@
 | 05 | [melhorias-produto](./05-melhorias-produto/README.md) | **Implementado** | `cursor/plan-features-complete-8862` |
 | 06 | [self-hosted](./06-self-hosted/README.md) | **Parcial** (Node mantido) | `cursor/plan-features-complete-8862` |
 | 07 | [auto-scroll-bpm](./07-auto-scroll-bpm/README.md) | Planejado | — |
+| 08 | [dicionario-acordes-variacoes](./08-dicionario-acordes-variacoes/README.md) | Planejado | — |
 
-## Próximo plano
+## Próximos planos
 
 **07 — auto-scroll BPM** — substituir slider de velocidade por rolagem sincronizada a batidas (BPM + tap tempo).
+
+**08 — dicionário de acordes e variações** — reconhecer acordes como entidades musicais e exibir diagramas SVG com formas alternativas.
 
 ## Arquitetura final
 
