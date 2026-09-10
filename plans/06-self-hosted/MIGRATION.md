@@ -72,18 +72,21 @@ Ver [MOBILE.md](./MOBILE.md).
 
 ---
 
-## Fase 6e — Deprecar `apps/api`
+## Fase 6e — Deprecar `apps/api` ⏸️ ADIADO
 
-### Checklist
+> **Decisão:** manter `apps/api` (Node) até empacotar a aplicação (Electron/Tauri/mobile com UI).
+> Esta fase **não foi executada** e não deve ser executada antes do empacotamento.
 
-- [ ] Mobile (e/ou desktop) cobre fluxos principais
-- [ ] Remover `apps/api` do `npm run dev` padrão ou marcar `deprecated` no README
-- [ ] Atualizar `vite.config.ts` — remover proxy se web migrar para desktop-only
-- [ ] Atualizar planos 01–05 e skill `implement-plan` (comandos curl → shared tests)
+### Checklist (quando empacotar)
+
+- [ ] App empacotado cobre busca + cifra + offline
+- [ ] Remover ou tornar opcional `apps/api` no fluxo de dev/prod
+- [ ] Atualizar `vite.config.ts` se web migrar para desktop-only
+- [ ] Documentar novo fluxo de execução
 
 ### Critério
 
-Só remover `apps/api` quando **nenhum** target de produção depender dele.
+Só remover `apps/api` quando o **binário empacotado** substituir o papel da API local.
 
 ---
 

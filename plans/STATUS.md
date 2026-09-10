@@ -9,7 +9,7 @@
 | 03 | [teclado](./03-teclado/README.md) | **Implementado** | `cursor/plan-features-complete-8862` |
 | 04 | [ux-seletor-erros](./04-ux-seletor-erros/README.md) | **Implementado** | `cursor/plan-features-complete-8862` |
 | 05 | [melhorias-produto](./05-melhorias-produto/README.md) | **Implementado** | `cursor/plan-features-complete-8862` |
-| 06 | [self-hosted](./06-self-hosted/README.md) | **Implementado** | `cursor/plan-features-complete-8862` |
+| 06 | [self-hosted](./06-self-hosted/README.md) | **Parcial** (Node mantido) | `cursor/plan-features-complete-8862` |
 | 07 | [auto-scroll-bpm](./07-auto-scroll-bpm/README.md) | Planejado | — |
 
 ## Próximo plano

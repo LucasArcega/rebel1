@@ -14,7 +14,7 @@ packages/
 plans/     # Roadmap numerado — ver plans/STATUS.md
 ```
 
-> A API roda em **localhost** (`npm run dev:api`) como conveniência de dev web (CORS). O parser vive em `packages/shared` e é reutilizado por `apps/mobile` para self-hosted.
+> **`apps/api` (Node) é obrigatório por hora** — rode `npm run dev:api` junto com o web. O parser vive em `packages/shared`; a remoção do Node só está prevista quando a app for empacotada (ver `plans/06-self-hosted/`).
 
 ### Camadas do frontend (`apps/web/src`)
 
