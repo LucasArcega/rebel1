@@ -33,5 +33,16 @@ export interface ChordSong {
   youtubeId: string | null;
   cifraclubUrl: string;
   content: string;
+  /** Structured chord symbols, when the source contains reliable harmonic markup. */
+  chords?: ChordOccurrence[];
   versions: ChordVersion[];
+}
+
+export interface ChordOccurrence {
+  /** Original spelling as it appeared in the song. */
+  symbol: string;
+  /** Stable canonical key used by the fingering dictionary. */
+  normalizedSymbol: string;
+  /** Zero-based ordinal after de-duplication. */
+  order: number;
 }

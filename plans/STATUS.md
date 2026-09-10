@@ -11,16 +11,17 @@
 | 05 | [melhorias-produto](./05-melhorias-produto/README.md) | **Implementado** | `cursor/plan-features-complete-8862` |
 | 06 | [self-hosted](./06-self-hosted/README.md) | **Parcial** (Node mantido) | `cursor/plan-features-complete-8862` |
 | 07 | [auto-scroll-bpm](./07-auto-scroll-bpm/README.md) | Planejado | — |
-| 08 | [dicionario-acordes-variacoes](./08-dicionario-acordes-variacoes/README.md) | Planejado | — |
+| 08 | [dicionario-acordes-variacoes](./08-dicionario-acordes-variacoes/README.md) | **Em revisão** | `codex/08-dicionario-acordes-variacoes-impl` |
 | 09 | [busca-local-e-filtros](./09-busca-local-e-filtros/README.md) | Planejado | — |
+| 10 | [base-ui-design-system](./10-base-ui-design-system/README.md) | Planejado | — |
 
 ## Próximos planos
 
 **07 — auto-scroll BPM** — rolagem sincronizada a batidas; BPM automático via [GetSongBPM](https://getsongbpm.com/api) (proxy em `apps/api`) + tap tempo + fallback manual.
 
-**08 — dicionário de acordes e variações** — reconhecer acordes como entidades musicais e exibir diagramas SVG com formas alternativas.
-
 **09 — busca local e filtros** — filtro instantâneo na biblioteca offline; busca híbrida (salvas primeiro + Solr deduplicado).
+
+**10 — Base UI e design system** — primitives acessíveis, tokens e layouts compartilhados; primeira migração no hover e seletor compacto de formas dos acordes.
 
 ## Arquitetura final
 

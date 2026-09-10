@@ -54,6 +54,7 @@ describe('parseCifraClubHtml', () => {
     const result = parseCifraClubHtml(CHORD_HTML, 'coldplay', 'the-scientist', BASE);
     expect(result?.content).toContain('<b>Dm7</b>');
     expect(result?.tone).toBe('Dm');
+    expect(result?.chords?.map((chord) => chord.symbol)).toEqual(['Dm7', 'Bb9']);
   });
 
   it('prefers lyric chords over tablature for cifra-group', () => {
@@ -76,15 +77,42 @@ describe('parseCifraClubHtml', () => {
   it('parses lyrics instrument', () => {
     const result = parseCifraClubHtml(LYRICS_HTML, 'coldplay', 'the-scientist', BASE, 'lyrics');
     expect(result?.content).toContain("Come up to meet you");
+    expect(result?.chords).toBeUndefined();
   });
 
   it('parses bass tablature', () => {
     const result = parseCifraClubHtml(BASS_HTML, 'avenged-sevenfold', 'buried-alive--', BASE, 'bass');
     expect(result?.content).toContain('G|');
+    expect(result?.chords).toBeUndefined();
   });
 
   it('parses keyboard like cifra when chord content exists', () => {
     const result = parseCifraClubHtml(CHORD_HTML, 'coldplay', 'the-scientist', BASE, 'keyboard');
     expect(result?.content).toContain('Dm7');
+  });
+
+  it('keeps lyric sections after inline tablature markers', () => {
+    const mixed = [
+      wrapChunk(
+        [
+          'Afinação: D A D G B E',
+          '[Intro] <b>D7M</b>  <b>B2</b>',
+          '[Tab - Intro]',
+          '#t1#E|----------|#/t1#',
+          '[Primeira Parte]',
+          '<b>B2</b>',
+          "Hello I've waited here for you",
+        ].join('\n'),
+      ),
+      wrapChunk(
+        '{"songData":{"priorityVersions":[{"id":1,"instrument":{"slug":"cifra-group","name":"Violão"},"label":{"name":"Principal","slug":"principal"}}],"artist":{"name":"Foo Fighters"},"song":{"name":"Everlong"},"id":887,"status":0,"tone":"D"}}',
+      ),
+    ].join('');
+
+    const result = parseCifraClubHtml(mixed, 'foo-fighters', 'everlong', BASE);
+    expect(result?.content).toContain('<b>D7M</b>');
+    expect(result?.content).toContain('[Primeira Parte]');
+    expect(result?.content).toContain("Hello I've waited here for you");
+    expect(result?.chords?.map((chord) => chord.symbol)).toEqual(['D7M', 'B2']);
   });
 });

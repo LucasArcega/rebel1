@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { extractChordOccurrences, transposeChordOccurrences } from '@cifra-hub/shared';
 import type { ChordSong } from '@/entities/chord';
 import {
   computeTransposeSemitones,
@@ -11,10 +12,11 @@ export const useChordTranspose = (chord: ChordSong) => {
   const [manualSemitones, setManualSemitones] = useState(0);
   const [capoFret, setCapoFret] = useState(0);
 
-  const canTranspose = useMemo(
-    () => hasTransposableChords(chord.content),
-    [chord.content],
+  const originalChordOccurrences = useMemo(
+    () => chord.chords?.length ? chord.chords : extractChordOccurrences(chord.content),
+    [chord.chords, chord.content],
   );
+  const canTranspose = originalChordOccurrences.length > 0 || hasTransposableChords(chord.content);
 
   const effectiveSemitones = computeTransposeSemitones(manualSemitones, capoFret);
 
@@ -26,6 +28,10 @@ export const useChordTranspose = (chord: ChordSong) => {
   const displayTone = useMemo(
     () => formatDisplayedTone(chord.tone, effectiveSemitones),
     [chord.tone, effectiveSemitones],
+  );
+  const chordOccurrences = useMemo(
+    () => transposeChordOccurrences(originalChordOccurrences, effectiveSemitones),
+    [effectiveSemitones, originalChordOccurrences],
   );
 
   const increase = () => setManualSemitones((value) => value + 1);
@@ -42,6 +48,7 @@ export const useChordTranspose = (chord: ChordSong) => {
     effectiveSemitones,
     displayContent,
     displayTone,
+    chordOccurrences,
     setCapoFret,
     increase,
     decrease,

@@ -89,6 +89,8 @@ Regras invariantes:
 - Pestanas referenciam cordas e casas existentes na digitação.
 - IDs são estáveis e não dependem da ordem do array.
 - O catálogo não contém duas entradas com o mesmo ID.
+- Valores numéricos em `frets` são casas absolutas. `baseFret` informa a primeira casa desenhada e não altera o cálculo de pitch.
+- `ChordOccurrence.order` é o índice zero-based no array deduplicado, não o offset textual.
 
 ### Evolução de `ChordSong`
 
@@ -109,7 +111,7 @@ O campo permanece opcional durante este plano. Isso mantém compatibilidade estr
 ```text
 root        := A..G + (# | b)?
 quality     := m | min | maj | M | dim | aug | + | ° | ø?
-extension   := 5 | 6 | 7 | 9 | 11 | 13 | maj7 | m7 | m9 | m11
+extension   := 2 | 5 | 6 | 7 | 9 | 11 | 13 | maj7 | m7 | m9 | m11
 suspension  := sus2 | sus4
 addition    := add2 | add4 | add9 | add11
 alteration  := b5 | #5 | b9 | #9 | #11 | b13
@@ -118,6 +120,8 @@ bass        := / + root
 ```
 
 O parser deve aceitar parênteses usuais nas alterações, por exemplo `C7(b9)`, e rejeitar símbolos incompletos sem lançar exceção. Aliases devem convergir para uma representação canônica (`min` → `m`, `M7` → `maj7`), preservando `raw`.
+
+Na notação curta, `C2` é alias de `Cadd2` e converge para a mesma chave normalizada.
 
 ## Fórmulas e validação musical
 
@@ -130,12 +134,14 @@ O parser deve aceitar parênteses usuais nas alterações, por exemplo `C7(b9)`,
 
 ## Extração no parser da cifra
 
-1. Em `extractLyricChordContent`, capturar o texto de cada `<b>...</b>` antes de `stripChordHtml`.
+1. Em `extractLyricChordContent`, capturar o texto de cada `<b>...</b>` preservando o HTML atual em `content`.
 2. Validar cada candidato com `parseChordSymbol`.
 3. Normalizar e deduplicar mantendo a primeira ordem de ocorrência.
 4. Retornar `chords` junto de `content`.
-5. Para conteúdo sem marcação semântica, expor `extractChordOccurrences(content)` como fallback conservador.
+5. Para conteúdo sem marcação semântica, expor `extractChordOccurrences(content)` como fallback conservador por linha e densidade de tokens.
 6. Não extrair acordes para `lyrics` nem para tablatura pura quando não houver evidência harmônica.
+
+O parser interno deve distinguir `lyric-chords`, `lyrics` e `tablature`. Apenas o primeiro popula `ChordSong.chords`; isso evita inferir acordes de palavras em versões de letra ou tab pura.
 
 Evitar manter duas regexes divergentes: transposição, detecção e fallback devem consumir o mesmo parser/tokenizador compartilhado.
 
@@ -158,6 +164,8 @@ O catálogo inicial deve combinar:
 6. Ordenar por prioridade, dificuldade, extensão da mão e posição.
 7. Retornar array vazio quando não houver forma confiável.
 
+`tuning` aceita `null` como afinação padrão e normaliza variantes textuais equivalentes a `E A D G B E`; uma afinação alternativa explícita retorna lista vazia.
+
 Não criar neste ticket um solver que enumere arbitrariamente todas as casas do braço.
 
 ## Transposição
@@ -170,46 +178,47 @@ Não criar neste ticket um solver que enumere arbitrariamente todas as casas do 
 
 ## Checklist
 
-- [ ] Adicionar tipos de harmonia e digitação ao pacote compartilhado.
-- [ ] Implementar parser, normalizador e fórmula musical.
-- [ ] Implementar extração ordenada e compatível no parser de cifra.
-- [ ] Evoluir `ChordSong` com campo opcional.
-- [ ] Criar e validar o catálogo inicial.
-- [ ] Centralizar a transposição no pacote compartilhado.
-- [ ] Reexportar apenas a API pública necessária.
-- [ ] Confirmar que API e mobile compilam sem alteração de endpoint.
+- [x] Adicionar tipos de harmonia e digitação ao pacote compartilhado.
+- [x] Implementar parser, normalizador e fórmula musical.
+- [x] Implementar extração ordenada e compatível no parser de cifra.
+- [x] Evoluir `ChordSong` com campo opcional.
+- [x] Criar e validar o catálogo inicial.
+- [x] Centralizar a transposição no pacote compartilhado.
+- [x] Reexportar apenas a API pública necessária.
+- [x] Confirmar que API e mobile compilam sem alteração de endpoint.
 
 ## Testes unitários obrigatórios
 
 ### Parser
 
-- [ ] `Am`, `Bb`, `F#m`, `Cmaj7`, `G7`, `Csus4`, `Cadd9`.
-- [ ] `C9`, `Bm11`, `D9/F#`, `C7(b9)`.
-- [ ] Aliases equivalentes produzem a mesma chave normalizada.
-- [ ] Entradas inválidas retornam resultado nulo, sem exceção.
-- [ ] Palavras e cabeçalhos de seção não são classificados como acordes.
+- [x] `Am`, `Bb`, `F#m`, `Cmaj7`, `G7`, `Csus4`, `Cadd9`.
+- [x] `C9`, `Bm11`, `D9/F#`, `C7(b9)`.
+- [x] Aliases equivalentes produzem a mesma chave normalizada.
+- [x] Entradas inválidas retornam resultado nulo, sem exceção.
+- [x] Palavras e cabeçalhos de seção não são classificados como acordes.
 
 ### Extração
 
-- [ ] Captura a sequência `Am Bm11 C C9 D D9/F# E` a partir de `<b>`.
-- [ ] Remove duplicatas preservando a primeira ocorrência.
-- [ ] Mantém `content` textual atual sem regressão.
-- [ ] Fallback reconhece acordes em registro legado e ignora letra comum.
+- [x] Captura a sequência `Am Bm11 C C9 D D9/F# E` a partir de `<b>`.
+- [x] Remove duplicatas preservando a primeira ocorrência.
+- [x] Mantém `content` textual atual sem regressão.
+- [x] Fallback reconhece acordes em registro legado e ignora letra comum.
 
 ### Digitações
 
-- [ ] Toda entrada respeita seis cordas e IDs únicos.
-- [ ] Todas as notas produzidas pertencem à fórmula, salvo metadado explícito permitido.
-- [ ] Notas essenciais estão presentes.
-- [ ] `D9/F#` tem `F#` como menor nota sonora.
-- [ ] Pestanas, dedos e casas são internamente consistentes.
-- [ ] Ordenação de variações é determinística.
+- [x] Toda entrada respeita seis cordas e IDs únicos.
+- [x] Todas as notas produzidas pertencem à fórmula, salvo metadado explícito permitido.
+- [x] Notas essenciais estão presentes.
+- [x] `D9/F#` tem `F#` como menor nota sonora.
+- [x] Pestanas, dedos e casas são internamente consistentes.
+- [x] Ordenação de variações é determinística.
+- [ ] Formas de `5`, `2`/`add2`, `6`, `9`, `add9`, `sus2` e `m9` são materializadas e validadas em diferentes raízes.
 
 ### Transposição
 
-- [ ] Raiz, acidentes, extensões e baixo invertido são preservados corretamente.
-- [ ] `D9/F#` transposto em `+2` resulta em `E9/G#`.
-- [ ] Transpor ocorrências não altera sua ordem.
+- [x] Raiz, acidentes, extensões e baixo invertido são preservados corretamente.
+- [x] `D9/F#` transposto em `+2` resulta em `E9/G#`.
+- [x] Transpor ocorrências não altera sua ordem.
 
 ## Verificação
 

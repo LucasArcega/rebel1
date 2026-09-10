@@ -683,6 +683,280 @@ a:hover {
   font-weight: 700;
 }
 
+.chord-token--previewable {
+  position: relative;
+  border-radius: 3px;
+  cursor: help;
+  outline: none;
+}
+
+.chord-token--previewable:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.chord-token-popover {
+  position: fixed;
+  z-index: 200;
+  display: grid;
+  gap: 0.4rem;
+  width: 176px;
+  padding: 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: var(--text);
+  transform: translateX(-50%);
+  white-space: normal;
+}
+
+.chord-token-popover--above {
+  transform: translate(-50%, -100%);
+}
+
+.chord-token-popover__variations {
+  min-height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--accent);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.75rem;
+}
+
+.chord-token-popover__variations:hover {
+  border-color: var(--accent);
+}
+
+.chord-token-popover__variations:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  outline-offset: 2px;
+}
+
+.song-chord-strip {
+  display: grid;
+  gap: 0.8rem;
+  width: 100%;
+  padding: 1rem 1.5rem 1.25rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.song-chord-strip__header,
+.song-chord-strip__heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.song-chord-strip__heading h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.song-chord-strip__heading span,
+.song-chord-strip--notice,
+.song-chord-strip--notice p {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.song-chord-strip__list {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding: 0.1rem 0 0.55rem;
+}
+
+.song-chord-card {
+  flex: 0 0 132px;
+  min-width: 0;
+  padding: 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  break-inside: avoid;
+}
+
+.song-chord-card--unavailable {
+  display: grid;
+  place-content: center;
+  min-height: 180px;
+  text-align: center;
+}
+
+.song-chord-card--unavailable h3,
+.song-chord-card--unavailable p {
+  margin: 0;
+}
+
+.song-chord-card--unavailable p {
+  margin-top: 0.5rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.song-chord-card__variations {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--accent);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+}
+
+.chord-diagram {
+  display: grid;
+  justify-items: center;
+  gap: 0.25rem;
+  width: 100%;
+  margin: 0;
+  color: var(--text);
+}
+
+.chord-diagram--sm { min-width: 72px; }
+.chord-diagram--md { max-width: 180px; }
+.chord-diagram--lg { max-width: 240px; }
+
+.chord-diagram__title {
+  min-height: 1.4em;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.chord-diagram__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.chord-diagram__string,
+.chord-diagram__fret {
+  stroke: currentColor;
+  stroke-width: 1.3;
+}
+
+.chord-diagram__nut {
+  stroke-width: 5;
+}
+
+.chord-diagram__barre {
+  stroke: var(--accent);
+  stroke-width: 15;
+  stroke-linecap: round;
+}
+
+.chord-diagram__finger circle {
+  fill: var(--accent);
+  stroke: var(--surface);
+  stroke-width: 1.5;
+}
+
+.chord-diagram__finger text {
+  fill: var(--bg);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.chord-diagram__marker,
+.chord-diagram__base-fret {
+  fill: currentColor;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.chord-diagram__base-fret { font-size: 10px; }
+
+.fingering-picker__backdrop {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.62);
+}
+
+.fingering-picker {
+  display: grid;
+  gap: 1rem;
+  width: min(760px, 100%);
+  max-height: min(720px, calc(100dvh - 2rem));
+  padding: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.fingering-picker__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.fingering-picker__header h2,
+.fingering-picker__header p { margin: 0; }
+.fingering-picker__header p { margin-top: 0.3rem; color: var(--muted); }
+
+.fingering-picker__close {
+  min-width: 44px;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 1.4rem;
+}
+
+.fingering-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+  overflow-y: auto;
+}
+
+.fingering-option {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  text-align: center;
+}
+
+.fingering-option--selected {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.fingering-option__meta,
+.fingering-option__tags { font-size: 0.75rem; }
+.fingering-option__tags { color: var(--muted); }
+
+.song-chord-card__variations:focus-visible,
+.fingering-picker button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  outline-offset: 2px;
+}
+
 [data-theme='light'] .chord-content-area {
   background: #f8fafc;
 }
@@ -731,6 +1005,48 @@ a:hover {
     display: none !important;
   }
 
+  .fingering-picker__backdrop,
+  .chord-token-popover,
+  .song-chord-card__variations,
+  .song-chord-strip__heading span {
+    display: none !important;
+  }
+
+  .song-chord-strip {
+    display: block;
+    padding: 0.5rem 0 1rem;
+    border: none;
+    background: white;
+    color: black;
+  }
+
+  .song-chord-strip__list {
+    display: flex;
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+
+  .song-chord-card {
+    flex-basis: 110px;
+    border-color: #777;
+    background: white;
+    color: black;
+    break-inside: avoid;
+  }
+
+  .chord-diagram__finger circle {
+    fill: #1f2937;
+    stroke: white;
+  }
+
+  .chord-diagram__finger text {
+    fill: white;
+  }
+
+  .chord-diagram__barre {
+    stroke: #1f2937;
+  }
+
   .chord-viewer,
   .chord-viewer__stage {
     display: block;
@@ -768,5 +1084,20 @@ a:hover {
 @media (max-width: 640px) {
   .app-main {
     padding: 1.25rem 1rem 3rem;
+  }
+
+  .song-chord-strip {
+    padding-inline: 1rem;
+  }
+
+  .fingering-picker__backdrop {
+    align-items: end;
+    padding: 0;
+  }
+
+  .fingering-picker {
+    width: 100%;
+    max-height: min(78dvh, 680px);
+    border-radius: var(--radius) var(--radius) 0 0;
   }
 }

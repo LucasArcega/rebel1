@@ -1,6 +1,7 @@
 import type { InstrumentSlug as SharedInstrumentSlug } from '@cifra-hub/shared';
 
 export type {
+  ChordOccurrence,
   ChordSong,
   ChordVersion,
   InstrumentSlug,

@@ -16,7 +16,11 @@ apps/web/
       chord-song.ts
     helpers/
       route-mock.ts
-    chord-diagrams.spec.ts
+    smoke/
+      chord-diagrams.spec.ts
+      chord-diagrams.dark.spec.ts
+    e2e/
+      chord-diagrams.api.e2e.spec.ts
 ```
 
 Adicionar `@playwright/test` às dependências de desenvolvimento do workspace web e os scripts:
@@ -30,7 +34,7 @@ Adicionar `@playwright/test` às dependências de desenvolvimento do workspace w
 }
 ```
 
-Configurar `baseURL` como `http://127.0.0.1:5173` e `webServer` com `npm run dev:web -- --host 127.0.0.1`. O mock de rota elimina a necessidade de iniciar `apps/api` nos testes determinísticos.
+Configurar `baseURL` como `http://127.0.0.1:5173` e, como a configuração vive no workspace web, `webServer` com `npm run dev -- --host 127.0.0.1`. O mock de rota elimina a necessidade de iniciar `apps/api` nos testes determinísticos. Não reutilizar automaticamente um servidor desconhecido que possa pertencer a outro worktree.
 
 ## Fixture principal
 
@@ -163,6 +167,8 @@ Executar como verificação separada, fora da suíte determinística padrão:
 
 O teste real não deve bloquear CI por instabilidade da fonte externa; a aceitação automatizada obrigatória usa fixtures locais.
 
+O spec de API real usa o sufixo `.api.e2e.spec.ts`, fica excluído do comando determinístico padrão e é executado explicitamente por `test:e2e:real`. Uma falha exclusivamente de rede/fonte externa deve ser registrada no handoff com o comando e a evidência.
+
 ## Comandos
 
 ```bash
@@ -171,6 +177,13 @@ npx playwright install chromium
 
 # suíte determinística
 npm run test:e2e -w @cifra-hub/web
+
+# smoke funcional e dark isolados
+npm run test:e2e -w @cifra-hub/web -- e2e/smoke/chord-diagrams.spec.ts --project=chromium
+npm run test:e2e -w @cifra-hub/web -- e2e/smoke/chord-diagrams.dark.spec.ts --project=chromium
+
+# integração separada com API real em :3001
+npm run test:e2e:real -w @cifra-hub/web
 
 # depuração interativa
 npm run test:e2e:ui -w @cifra-hub/web

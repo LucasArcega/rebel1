@@ -1,3 +1,5 @@
+import { parseChordSymbol } from '@cifra-hub/shared';
+
 export type ChordSegment = {
   type: 'text' | 'chord';
   value: string;
@@ -5,20 +7,22 @@ export type ChordSegment = {
 
 const TAB_MARKERS = /#\/?t\d+#/g;
 const BOLD_CHORD = /<b>([\s\S]*?)<\/b>/gi;
-const CHORD_TOKEN =
-  /^[A-G](?:#|b)?(?:m|M|maj|min|dim|aug|sus|add)?[0-9]*(?:\([^)]+\))?(?:sus[24])?(?:\/[A-G](?:#|b)?)?$/;
 const SECTION_HEADER = /^\[[^\]]+\]$/;
+const TUNING_LINE = /^\s*afina(?:ção|cao)\s*:/i;
 
 const isTabLine = (line: string) => /^[EADGBe]\|/.test(line.trim());
+const isChordToken = (token: string) => Boolean(parseChordSymbol(token));
 
 const isChordLine = (line: string) => {
-  const tokens = line.trim().split(/\s+/).filter(Boolean);
-  if (!tokens.length || isTabLine(line)) return false;
-  const chords = tokens.filter((token) => CHORD_TOKEN.test(token));
+  const plain = line.replace(/<[^>]+>/g, ' ').trim();
+  if (!plain || isTabLine(line) || TUNING_LINE.test(plain)) return false;
+  const tokens = plain.split(/\s+/).filter(Boolean);
+  const chords = tokens.filter((token) => isChordToken(token));
   return chords.length >= Math.max(1, Math.ceil(tokens.length * 0.6));
 };
 
 export const isSectionHeaderLine = (line: string) => SECTION_HEADER.test(line.trim());
+export const isTuningLine = (line: string) => TUNING_LINE.test(line.replace(/<[^>]+>/g, '').trim());
 
 export const cleanChordContent = (content: string) => content.replace(TAB_MARKERS, '');
 
@@ -63,7 +67,7 @@ const splitPlainTokens = (line: string): ChordSegment[] => {
 
   for (const token of line.split(/(\s+)/)) {
     if (!token) continue;
-    if (/^\s+$/.test(token) || !CHORD_TOKEN.test(token)) {
+    if (/^\s+$/.test(token) || !isChordToken(token)) {
       pushText(segments, token);
       continue;
     }

@@ -88,6 +88,7 @@ Ao carregar uma preferência cujo ID não existe mais, removê-la e usar a prime
 3. Passar os símbolos resultantes ao dicionário.
 4. Renderizar a faixa depois do seletor de versão e antes de `.chord-tools`.
 5. Reinicializar seleção aberta quando a música ou versão mudar.
+6. Renderizar um preview não intrusivo ao passar o mouse ou focar acordes reconhecidos no corpo da cifra, usando a mesma afinação e símbolo transposto da faixa.
 
 Não extrair acordes de `displayContent` em todo render se `ChordSong.chords` estiver disponível. Memorizar resultados por conteúdo, afinação e semitons.
 
@@ -129,24 +130,24 @@ Não extrair acordes de `displayContent` em todo render se `ChordSong.chords` es
 
 ## Checklist
 
-- [ ] Criar `entities/chord-diagram` com SVG e testes de renderização pertinentes.
-- [ ] Criar `features/select-chord-fingering` e storage resiliente.
-- [ ] Criar `widgets/song-chord-strip`.
-- [ ] Integrar no `ChordViewer` sem acoplar o widget ao fetch.
-- [ ] Integrar transposição e capo por dados estruturados.
-- [ ] Cobrir estados vazio, sem suporte e preferência inválida.
-- [ ] Aplicar responsividade, dark mode, acessibilidade e impressão.
-- [ ] Adicionar configuração e scripts Playwright descritos em `PLAYWRIGHT.md`.
+- [x] Criar `entities/chord-diagram` com SVG e testes de renderização pertinentes.
+- [x] Criar `features/select-chord-fingering` e storage resiliente.
+- [x] Criar `widgets/song-chord-strip`.
+- [x] Integrar no `ChordViewer` sem acoplar o widget ao fetch.
+- [x] Integrar transposição e capo por dados estruturados.
+- [x] Cobrir estados vazio, sem suporte e preferência inválida.
+- [x] Aplicar responsividade, dark mode, acessibilidade e impressão.
+- [x] Adicionar configuração e scripts Playwright descritos em `PLAYWRIGHT.md`.
 
 ## Testes de componente/unidade
 
-- [ ] SVG com cordas abertas, abafadas e pressionadas.
-- [ ] Pestana única e casa inicial maior que 1.
-- [ ] Descrição acessível do diagrama.
-- [ ] Deduplicação e ordem da faixa.
-- [ ] Recuperação e invalidação da preferência local.
-- [ ] Troca de transposição/capo substitui símbolos e formas.
-- [ ] Afinação alternativa não apresenta forma de afinação padrão.
+- [x] SVG com cordas abertas, abafadas e pressionadas.
+- [x] Pestana única e casa inicial maior que 1.
+- [x] Descrição acessível do diagrama.
+- [x] Deduplicação e ordem da faixa.
+- [x] Recuperação e invalidação da preferência local.
+- [x] Troca de transposição/capo substitui símbolos e formas.
+- [x] Afinação alternativa não apresenta forma de afinação padrão.
 
 ## Verificação
 

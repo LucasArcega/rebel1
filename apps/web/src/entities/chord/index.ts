@@ -5,4 +5,10 @@ export {
   isInstrumentSupported,
   isVersionSelectable,
 } from './lib/supported-instruments';
-export type { ChordSearchParams, ChordSong, ChordVersion, InstrumentSlug } from './model/types';
+export type {
+  ChordOccurrence,
+  ChordSearchParams,
+  ChordSong,
+  ChordVersion,
+  InstrumentSlug,
+} from './model/types';

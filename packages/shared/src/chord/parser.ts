@@ -1,3 +1,4 @@
+import { extractChordOccurrences } from '../harmony/extract-chords.js';
 import type { ChordSong, ChordVersion, InstrumentSlug } from './types.js';
 
 const INSTRUMENT_PATHS: Record<string, string> = {
@@ -15,7 +16,8 @@ const INSTRUMENT_PATHS: Record<string, string> = {
 };
 
 const TAB_LINE_PATTERN = /^[EADGB]\|/m;
-const CHUNK_STOP_MARKERS = ['","metadata"', '"/t', '"\\n"]', '</pre>', '#/t'];
+const RSC_PAYLOAD_STOP_MARKERS = ['","metadata"', '"\\n"]', '</pre>'];
+const CHUNK_STOP_MARKERS = [...RSC_PAYLOAD_STOP_MARKERS, '"/t', '#/t'];
 const TABLATURE_STOP_MARKERS = [
   ...CHUNK_STOP_MARKERS,
   '[Primeira Parte]',
@@ -208,7 +210,7 @@ const extractLyricChordContent = (chunk: string): string | null => {
   if (sectionStart === -1) return null;
 
   const tuningMatch = chunk.slice(0, sectionStart).match(/Afin[a-zA-ZçãõÇÃÕ: ]+/i);
-  const body = cleanExtractedContent(sliceUntilMarkers(chunk, sectionStart));
+  const body = cleanExtractedContent(sliceUntilMarkers(chunk, sectionStart, RSC_PAYLOAD_STOP_MARKERS));
   const tuning = tuningMatch ? stripChordHtml(tuningMatch[0]).trim() : null;
 
   return tuning ? `${tuning}\n\n${body}` : body || null;
@@ -358,6 +360,9 @@ export const parseCifraClubHtml = (
   if (!content) return null;
 
   const versions = extractPriorityVersions(songChunk, artistSlug, songSlug);
+  const chords = LYRIC_CHORD_INSTRUMENTS.has(instrument)
+    ? extractChordOccurrences(content)
+    : undefined;
 
   return {
     artistSlug,
@@ -372,6 +377,7 @@ export const parseCifraClubHtml = (
     youtubeId: extractYoutubeId(html),
     cifraclubUrl: `${cifraclubBaseUrl}${buildVersionPath(artistSlug, songSlug, instrument, version)}`,
     content,
+    chords,
     versions,
   };
 };

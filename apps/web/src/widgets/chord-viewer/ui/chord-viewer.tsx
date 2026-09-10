@@ -7,6 +7,7 @@ import { ChordTransposeControls, useChordTranspose } from '@/features/transpose-
 import { VersionSelector } from '@/features/select-version';
 import { ChordContent } from './chord-content';
 import { ChordMeta } from './chord-meta';
+import { SongChordStrip } from './song-chord-strip';
 
 interface ChordViewerProps {
   chord: ChordSong;
@@ -14,11 +15,15 @@ interface ChordViewerProps {
   fetchParams: Pick<ChordSearchParams, 'instrument' | 'version'>;
 }
 
-export const ChordViewer = ({ chord, source, fetchParams }: ChordViewerProps) => {
+const ChordViewerState = ({ chord, source, fetchParams }: ChordViewerProps) => {
   const activeVersion = chord.versions.find((version) => version.id === chord.versionId);
   const transpose = useChordTranspose(chord);
   const autoScroll = useAutoScroll();
   const display = useChordDisplaySettings();
+  const instrument = fetchParams.instrument ?? activeVersion?.instrumentSlug;
+  const diagramsDisabledReason = instrument && !['cifra-group', 'guitar'].includes(instrument)
+    ? 'Diagramas disponíveis apenas para cifras de violão'
+    : undefined;
 
   return (
     <section className="chord-viewer">
@@ -75,12 +80,27 @@ export const ChordViewer = ({ chord, source, fetchParams }: ChordViewerProps) =>
         </header>
 
         <ChordMeta chord={chord} displayTone={transpose.displayTone} capoFret={transpose.capoFret} />
+        <SongChordStrip
+          key={`${chord.artistSlug}/${chord.songSlug}/${chord.versionId}`}
+          chords={transpose.chordOccurrences}
+          tuning={chord.tuning}
+          disabledReason={diagramsDisabledReason}
+        />
         <ChordContent
           content={transpose.displayContent}
           contentRef={autoScroll.contentRef}
           fontSize={display.fontSize}
+          tuning={chord.tuning}
+          diagramsEnabled={!diagramsDisabledReason}
         />
       </div>
     </section>
   );
 };
+
+export const ChordViewer = (props: ChordViewerProps) => (
+  <ChordViewerState
+    key={`${props.chord.artistSlug}/${props.chord.songSlug}/${props.chord.versionId}`}
+    {...props}
+  />
+);
