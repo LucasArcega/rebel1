@@ -62,12 +62,19 @@ export const transposeChord = (chord: string, semitones: number, preferFlats = f
 };
 
 export const hasTransposableChords = (content: string) => {
+  if (content.includes('<b>')) return true;
   CHORD_PATTERN.lastIndex = 0;
   return CHORD_PATTERN.test(content);
 };
 
 export const transposeContent = (content: string, semitones: number, preferFlats = false) => {
   if (!semitones) return content;
+  if (content.includes('<b>')) {
+    return content.replace(
+      /<b>([\s\S]*?)<\/b>/gi,
+      (_, chord: string) => `<b>${transposeChord(chord.trim(), semitones, preferFlats)}</b>`,
+    );
+  }
   return content.replace(CHORD_PATTERN, (match) => transposeChord(match, semitones, preferFlats));
 };
 

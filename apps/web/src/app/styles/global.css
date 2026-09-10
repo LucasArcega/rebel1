@@ -91,6 +91,10 @@ a:hover {
   padding: 2rem 1.5rem 4rem;
 }
 
+.app-main:has(.page--song) {
+  max-width: 1240px;
+}
+
 .page {
   display: grid;
   gap: 1.5rem;
@@ -114,7 +118,6 @@ a:hover {
 }
 
 .search-panel,
-.chord-viewer,
 .error-state {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -183,16 +186,69 @@ a:hover {
   background: var(--accent-hover);
 }
 
+.chord-viewer {
+  display: grid;
+  grid-template-columns: minmax(240px, 280px) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.chord-viewer__sidebar {
+  position: sticky;
+  top: 4.75rem;
+  display: grid;
+  gap: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.chord-viewer__stage {
+  min-width: 0;
+  min-height: calc(100vh - 8rem);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem 0 0;
+  box-shadow: var(--shadow);
+}
+
+.chord-viewer__header,
+.chord-meta {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.chord-viewer__header {
+  margin-bottom: 1rem;
+}
+
 .chord-viewer__artist {
   margin: 0;
   color: var(--muted);
 }
 
 .chord-viewer__header {
+  width: 100%;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
+  text-align: center;
+}
+
+.chord-viewer__header > div:first-child {
+  flex: 1;
 }
 
 .chord-viewer__title {
@@ -335,6 +391,22 @@ a:hover {
   color: var(--muted);
 }
 
+.version-selector__groups {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.version-selector__group {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.version-selector__instrument {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
 .version-selector__list {
   display: flex;
   flex-wrap: wrap;
@@ -437,11 +509,15 @@ a:hover {
   gap: 0.5rem;
   color: var(--muted);
   font-size: 0.92rem;
+  text-align: center;
+  justify-items: center;
+  margin-bottom: 1rem;
 }
 
 .chord-meta__row {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 0.75rem 1.25rem;
 }
 
@@ -549,34 +625,78 @@ a:hover {
   cursor: not-allowed;
 }
 
-.chord-content {
-  margin: 0;
-  padding: 1rem;
-  border-radius: 12px;
-  background: #0b0d11;
-  border: 1px solid var(--border);
-  overflow: auto;
-  max-height: 70vh;
-  white-space: pre-wrap;
-  font-family: 'Roboto Mono', monospace;
-  font-size: 0.82rem;
-  line-height: 1.45;
+.chord-viewer__sidebar .chord-transpose,
+.chord-viewer__sidebar .auto-scroll,
+.chord-viewer__sidebar .chord-display-controls {
+  padding: 0.65rem 0 0;
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
 }
 
-[data-theme='light'] .chord-content {
+.chord-content-area {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 1.5rem 1.75rem 2rem;
+  border-radius: 0 0 var(--radius) var(--radius);
+  background: #0b0d11;
+  border: none;
+  border-top: 1px solid var(--border);
+  overflow-x: auto;
+}
+
+.chord-content {
+  width: 100%;
+  max-width: 52rem;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.chord-line {
+  font-family: 'Roboto Mono', ui-monospace, monospace;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  white-space: pre;
+  color: var(--text);
+}
+
+.chord-line--spacer {
+  height: 0.65rem;
+}
+
+.chord-line--section {
+  margin-top: 0.85rem;
+  color: var(--muted);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.chord-line--section:first-child {
+  margin-top: 0;
+}
+
+.chord-token {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+[data-theme='light'] .chord-content-area {
   background: #f8fafc;
 }
 
-.chord-content--sm {
+.chord-content--sm .chord-line {
   font-size: 0.72rem;
 }
 
-.chord-content--md {
-  font-size: 0.82rem;
+.chord-content--md .chord-line {
+  font-size: 0.88rem;
 }
 
-.chord-content--lg {
-  font-size: 0.95rem;
+.chord-content--lg .chord-line {
+  font-size: 0.98rem;
 }
 
 .spinner {
@@ -601,6 +721,7 @@ a:hover {
 
 @media print {
   .app-header,
+  .chord-viewer__sidebar,
   .chord-tools,
   .version-selector,
   .chord-meta__links,
@@ -610,11 +731,37 @@ a:hover {
     display: none !important;
   }
 
-  .chord-content {
-    max-height: none;
+  .chord-viewer,
+  .chord-viewer__stage {
+    display: block;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .chord-content-area {
     border: none;
     background: white;
     color: black;
+  }
+
+  .chord-line {
+    color: black;
+  }
+
+  .chord-token {
+    color: #c45c00;
+  }
+}
+
+@media (max-width: 860px) {
+  .chord-viewer {
+    grid-template-columns: 1fr;
+  }
+
+  .chord-viewer__sidebar {
+    position: static;
   }
 }
 

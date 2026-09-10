@@ -15,7 +15,21 @@ const INSTRUMENT_PATHS: Record<string, string> = {
 };
 
 const TAB_LINE_PATTERN = /^[EADGB]\|/m;
-const CHUNK_STOP_MARKERS = ['","metadata"', '"/t', '"\\n"]', '</pre>'];
+const CHUNK_STOP_MARKERS = ['","metadata"', '"/t', '"\\n"]', '</pre>', '#/t'];
+const TABLATURE_STOP_MARKERS = [
+  ...CHUNK_STOP_MARKERS,
+  '[Primeira Parte]',
+  '[Intro]',
+  '[Refrão]',
+  '[Refrao]',
+];
+const LYRIC_CHORD_INSTRUMENTS = new Set<InstrumentSlug>([
+  'cifra-group',
+  'keyboard',
+  'ukulele',
+  'viola',
+]);
+const TAB_MARKER_PATTERN = /#\/?t\d+#/g;
 
 const decodeRscChunk = (chunk: string): string =>
   chunk
@@ -34,22 +48,28 @@ const extractRscChunks = (html: string): string[] => {
   return chunks;
 };
 
-const stripChordHtml = (value: string): string =>
+const decodeChordEntities = (value: string): string =>
   value
-    .replace(/<b>/g, '')
-    .replace(/<\/b>/g, '')
     .replace(/<br\s*\/?>/gi, '\n')
     .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
+    .replace(/&amp;/g, '&');
+
+const stripChordHtml = (value: string): string =>
+  decodeChordEntities(value)
+    .replace(/<b>/g, '')
+    .replace(/<\/b>/g, '')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>');
 
-const sliceUntilMarkers = (chunk: string, start: number): string => {
+const cleanExtractedContent = (value: string): string =>
+  decodeChordEntities(value).replace(TAB_MARKER_PATTERN, '').replace(/\n{3,}/g, '\n\n').trim();
+
+const sliceUntilMarkers = (chunk: string, start: number, stops = CHUNK_STOP_MARKERS): string => {
   let end = chunk.length;
 
-  for (const stop of CHUNK_STOP_MARKERS) {
+  for (const stop of stops) {
     const idx = chunk.indexOf(stop, start);
-    if (idx !== -1) end = Math.min(end, idx);
+    if (idx > start) end = Math.min(end, idx);
   }
 
   return chunk.slice(start, end).trim();
@@ -158,7 +178,8 @@ const extractTablatureContent = (chunk: string): string | null => {
   const start = chunk.indexOf('E|', marker);
   if (start === -1) return null;
 
-  return sliceUntilMarkers(chunk, start);
+  const extracted = cleanExtractedContent(sliceUntilMarkers(chunk, start, TABLATURE_STOP_MARKERS));
+  return extracted || null;
 };
 
 const extractGenericTablatureContent = (chunk: string): string | null => {
@@ -168,25 +189,41 @@ const extractGenericTablatureContent = (chunk: string): string | null => {
   const start = match?.index ?? chunk.search(/[EADGB]\|/);
   if (start === -1) return null;
 
-  const slice = sliceUntilMarkers(chunk, start);
+  const slice = sliceUntilMarkers(chunk, start, TABLATURE_STOP_MARKERS);
   const tabLines = slice.split('\n').filter((line) => /^[EADGB]\|/.test(line) || line.trim() === '' || /^\d+:\d+$/.test(line.trim()) || /^(Intro|Verso|Refrão)/i.test(line.trim()));
 
   if (tabLines.filter((line) => /^[EADGB]\|/.test(line)).length < 2) return null;
 
-  return tabLines.join('\n').trim();
+  const extracted = cleanExtractedContent(tabLines.join('\n'));
+  return extracted || null;
 };
 
 const extractLyricChordContent = (chunk: string): string | null => {
   if (!chunk.includes('[Primeira Parte]') && !chunk.includes('<b>')) return null;
 
-  const sectionStart = chunk.search(/\[(?:Intro|Primeira Parte|Refr[aã]o)/i);
+  let sectionStart = chunk.search(/\[(?:Intro|Primeira Parte|Segunda Parte|Refr[aã]o|Ponte|Solo|Final)/i);
+  if (sectionStart === -1) {
+    sectionStart = chunk.search(/<b>/i);
+  }
   if (sectionStart === -1) return null;
 
   const tuningMatch = chunk.slice(0, sectionStart).match(/Afin[a-zA-ZçãõÇÃÕ: ]+/i);
-  const body = stripChordHtml(sliceUntilMarkers(chunk, sectionStart));
+  const body = cleanExtractedContent(sliceUntilMarkers(chunk, sectionStart));
   const tuning = tuningMatch ? stripChordHtml(tuningMatch[0]).trim() : null;
 
-  return tuning ? `${tuning}\n\n${body}` : body;
+  return tuning ? `${tuning}\n\n${body}` : body || null;
+};
+
+const extractFirstMatch = (
+  chunks: string[],
+  extractor: (chunk: string) => string | null,
+): string | null => {
+  for (const chunk of chunks) {
+    const match = extractor(chunk);
+    if (match) return match;
+  }
+
+  return null;
 };
 
 const extractChordContent = (chunks: string[], instrument: InstrumentSlug): string | null => {
@@ -195,20 +232,17 @@ const extractChordContent = (chunks: string[], instrument: InstrumentSlug): stri
     if (lyrics) return lyrics;
   }
 
-  for (const chunk of chunks) {
-    const tablature = extractTablatureContent(chunk);
-    if (tablature) return tablature;
-  }
+  const lyricChords = () => extractFirstMatch(chunks, extractLyricChordContent);
+  const tablature = () =>
+    extractFirstMatch(chunks, extractTablatureContent) ??
+    extractFirstMatch(chunks, extractGenericTablatureContent);
 
-  for (const chunk of chunks) {
-    const genericTab = extractGenericTablatureContent(chunk);
-    if (genericTab) return genericTab;
-  }
+  const preferLyricChords = LYRIC_CHORD_INSTRUMENTS.has(instrument);
+  const content = preferLyricChords
+    ? lyricChords() ?? tablature()
+    : tablature() ?? lyricChords();
 
-  for (const chunk of chunks) {
-    const lyricChord = extractLyricChordContent(chunk);
-    if (lyricChord) return lyricChord;
-  }
+  if (content) return content;
 
   if (instrument !== 'lyrics') {
     const fallbackLyrics = extractLyricsContent(chunks);

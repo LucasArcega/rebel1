@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 export const useAutoScroll = () => {
-  const contentRef = useRef<HTMLPreElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [speed, setSpeed] = useState(40);
 
@@ -9,12 +9,12 @@ export const useAutoScroll = () => {
     if (!isPlaying) return;
 
     const interval = window.setInterval(() => {
-      const element = contentRef.current;
-      if (!element) return;
+      window.scrollBy(0, 1);
 
-      element.scrollTop += 1;
+      const atBottom =
+        window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
 
-      if (element.scrollTop + element.clientHeight >= element.scrollHeight - 2) {
+      if (atBottom) {
         setIsPlaying(false);
       }
     }, speed);
@@ -23,8 +23,18 @@ export const useAutoScroll = () => {
   }, [isPlaying, speed]);
 
   const pause = () => setIsPlaying(false);
-  const play = () => setIsPlaying(true);
-  const toggle = () => setIsPlaying((value) => !value);
+  const play = () => {
+    contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setIsPlaying(true);
+  };
+
+  const toggle = () => {
+    if (isPlaying) {
+      setIsPlaying(false);
+      return;
+    }
+    play();
+  };
 
   return {
     contentRef,

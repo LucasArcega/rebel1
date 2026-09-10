@@ -22,61 +22,65 @@ export const ChordViewer = ({ chord, source, fetchParams }: ChordViewerProps) =>
 
   return (
     <section className="chord-viewer">
-      <header className="chord-viewer__header">
-        <div>
-          <p className="chord-viewer__artist">{chord.artistName}</p>
-          <h1 className="chord-viewer__title">{chord.songName}</h1>
-          {activeVersion && activeVersion.labelSlug !== 'principal' && (
-            <span className="version-badge">{activeVersion.label}</span>
-          )}
-        </div>
-        <div className="chord-viewer__badges">
-          {source === 'offline' && <span className="offline-badge">Offline</span>}
-          {source === 'network' && <span className="saved-badge">Salva offline</span>}
-          <SaveChordButton chord={chord} params={fetchParams} />
-        </div>
-      </header>
-
-      <VersionSelector
-        artistSlug={chord.artistSlug}
-        songSlug={chord.songSlug}
-        versions={chord.versions}
-        activeVersionId={chord.versionId}
-      />
-
-      <div className="chord-tools">
-        {transpose.canTranspose && (
-          <ChordTransposeControls
-            manualSemitones={transpose.manualSemitones}
-            capoFret={transpose.capoFret}
-            effectiveSemitones={transpose.effectiveSemitones}
-            onIncrease={transpose.increase}
-            onDecrease={transpose.decrease}
-            onCapoChange={transpose.setCapoFret}
-            onReset={transpose.reset}
-          />
-        )}
-        <AutoScrollControls
-          isPlaying={autoScroll.isPlaying}
-          speed={autoScroll.speed}
-          onToggle={autoScroll.toggle}
-          onSpeedChange={autoScroll.setSpeed}
+      <aside className="chord-viewer__sidebar">
+        <VersionSelector
+          artistSlug={chord.artistSlug}
+          songSlug={chord.songSlug}
+          versions={chord.versions}
+          activeVersionId={chord.versionId}
         />
-        <ChordDisplayControls
+
+        <div className="chord-tools">
+          {transpose.canTranspose && (
+            <ChordTransposeControls
+              manualSemitones={transpose.manualSemitones}
+              capoFret={transpose.capoFret}
+              effectiveSemitones={transpose.effectiveSemitones}
+              onIncrease={transpose.increase}
+              onDecrease={transpose.decrease}
+              onCapoChange={transpose.setCapoFret}
+              onReset={transpose.reset}
+            />
+          )}
+          <AutoScrollControls
+            isPlaying={autoScroll.isPlaying}
+            speed={autoScroll.speed}
+            onToggle={autoScroll.toggle}
+            onSpeedChange={autoScroll.setSpeed}
+          />
+          <ChordDisplayControls
+            fontSize={display.fontSize}
+            theme={display.theme}
+            onFontSizeChange={display.setFontSize}
+            onToggleTheme={display.toggleTheme}
+            onPrint={display.printChord}
+          />
+        </div>
+      </aside>
+
+      <div className="chord-viewer__stage">
+        <header className="chord-viewer__header">
+          <div>
+            <p className="chord-viewer__artist">{chord.artistName}</p>
+            <h1 className="chord-viewer__title">{chord.songName}</h1>
+            {activeVersion && activeVersion.labelSlug !== 'principal' && (
+              <span className="version-badge">{activeVersion.instrument} · {activeVersion.label}</span>
+            )}
+          </div>
+          <div className="chord-viewer__badges">
+            {source === 'offline' && <span className="offline-badge">Offline</span>}
+            {source === 'network' && <span className="saved-badge">Salva offline</span>}
+            <SaveChordButton chord={chord} params={fetchParams} />
+          </div>
+        </header>
+
+        <ChordMeta chord={chord} displayTone={transpose.displayTone} capoFret={transpose.capoFret} />
+        <ChordContent
+          content={transpose.displayContent}
+          contentRef={autoScroll.contentRef}
           fontSize={display.fontSize}
-          theme={display.theme}
-          onFontSizeChange={display.setFontSize}
-          onToggleTheme={display.toggleTheme}
-          onPrint={display.printChord}
         />
       </div>
-
-      <ChordMeta chord={chord} displayTone={transpose.displayTone} capoFret={transpose.capoFret} />
-      <ChordContent
-        content={transpose.displayContent}
-        contentRef={autoScroll.contentRef}
-        fontSize={display.fontSize}
-      />
     </section>
   );
 };

@@ -52,8 +52,25 @@ describe('buildVersionPath', () => {
 describe('parseCifraClubHtml', () => {
   it('parses lyric chord content', () => {
     const result = parseCifraClubHtml(CHORD_HTML, 'coldplay', 'the-scientist', BASE);
-    expect(result?.content).toContain('Dm7');
+    expect(result?.content).toContain('<b>Dm7</b>');
     expect(result?.tone).toBe('Dm');
+  });
+
+  it('prefers lyric chords over tablature for cifra-group', () => {
+    const mixed = [
+      wrapChunk(
+        '#t1#E|----------|#/t1#\\n[Primeira Parte]\\n\\n<b>Am</b>         <b>F6(11+)</b>\\n  Such a lonely day',
+      ),
+      wrapChunk(
+        '{"songData":{"priorityVersions":[{"id":1,"instrument":{"slug":"cifra-group","name":"Violão"},"label":{"name":"Principal","slug":"principal"}}],"artist":{"name":"SOAD"},"song":{"name":"Lonely Day"},"id":1,"status":0}}',
+      ),
+    ].join('');
+
+    const result = parseCifraClubHtml(mixed, 'system-of-a-down', 'lonely-day', BASE);
+    expect(result?.content).toContain('<b>Am</b>');
+    expect(result?.content).toContain('Such a lonely day');
+    expect(result?.content).not.toContain('#t1#');
+    expect(result?.content).not.toMatch(/^E\|/m);
   });
 
   it('parses lyrics instrument', () => {

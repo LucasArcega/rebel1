@@ -13,7 +13,7 @@ O objetivo é sincronizar a rolagem com **BPM** (batidas por minuto), de forma q
 
 ```typescript
 // apps/web/src/features/auto-scroll-chord/model/use-auto-scroll.ts
-// scrollTop += 1 a cada `speed` ms (20–120)
+// window.scrollBy a cada `speed` ms (20–120) — legado do plano 05
 ```
 
 ### Situação alvo
@@ -21,26 +21,60 @@ O objetivo é sincronizar a rolagem com **BPM** (batidas por minuto), de forma q
 ```
 intervalo entre batidas = 60_000 / bpm  (ms)
 a cada batida → rolar N pixels (configurável ou derivado da fonte)
+BPM inicial → GetSongBPM (artist + song) via apps/api
+fallback → tap tempo + input manual
 ```
 
-O Cifra Club **não expõe BPM** no SSR que parseamos hoje (`ChordSong` não tem campo `bpm`). O BPM será **informado pelo usuário** ou calculado via **tap tempo**.
+## Pesquisa de fontes de BPM (2026)
+
+| Fonte | BPM por nome? | Situação |
+|-------|---------------|----------|
+| **Cifra Club (SSR/parser)** | Não | `ChordSong` não traz BPM |
+| **Spotify `/audio-features`** | Sim (via `tempo`) | **403** para apps novos (nov/2024+) |
+| **[GetSongBPM](https://getsongbpm.com/api)** | Sim | **Escolhida** — API REST, busca por artista + título |
+| [FreqBlog](https://freqblog.com/) | Sim | Alternativa futura (quota mensal) |
+| [AcousticBrainz](https://acousticbrainz.org/) | Sim | Requer MusicBrainz ID; bulk CC0, projeto parado |
+| [TuneBat](https://tunebat.com/) | Sim | Sem API oficial pública |
+
+### GetSongBPM — decisão e limites
+
+- **Gratuito hoje**, com API key; **não há garantia contratual de “grátis para sempre”**
+- **Obrigatório:** link de volta para [GetSongBPM](https://getsongbpm.com) no app (site, UI ou listing) — sob pena de suspensão da chave
+- **Rate limit:** ~3.000 requisições/hora por chave; exceder bloqueia a chave por 1 h
+- **Base URL:** `https://api.getsongbpm.com`
+- **Auth:** `api_key` (query) ou header `X-API-KEY`
+- **Cobertura:** forte em catálogo internacional; **MPB/gospel/sertanejo** pode faltar ou errar → tap tempo continua essencial
 
 ## Critérios de aceite
 
-- [ ] Controle de BPM (input numérico + slider, faixa ex.: 40–240)
-- [ ] **Tap tempo**: 3+ toques calculam BPM médio e preenchem o campo
+### BPM automático (GetSongBPM)
+
+- [ ] Endpoint `GET /api/bpm?artist={slug}&song={slug}` no `apps/api` (proxy — **nunca** expor API key no web)
+- [ ] Variável de ambiente `GETSONGBPM_API_KEY` (documentada em `.env.example`)
+- [ ] Resposta normalizada: `{ bpm, key?, timeSig?, source: 'getsongbpm' | 'cache' }` ou `404` quando não encontrado
+- [ ] Ao abrir uma música, buscar BPM e **pré-preencher** o controle de auto-scroll
+- [ ] Estados UI: carregando / encontrado / não encontrado / erro de rede
+- [ ] **Backlink obrigatório** visível quando BPM veio do GetSong (ex.: rodapé da sidebar “BPM: GetSongBPM”)
+- [ ] Cache por música (`artistSlug/songSlug`) em `localStorage` + cache curto no servidor (evitar rate limit)
+
+### Rolagem sincronizada
+
+- [ ] Controle de BPM (input numérico + slider, faixa 40–240)
+- [ ] **Tap tempo**: 3+ toques calculam BPM médio e preenchem o campo (sobrescreve valor buscado)
 - [ ] Rolagem sincronizada: a cada batida, `scrollTop += pixelsPerBeat`
-- [ ] Ajuste de **pixels por batida** (ou “linhas por batida”) para calibrar à densidade da cifra
+- [ ] Ajuste de **linhas por batida** (0.5–4, step 0.25) para calibrar densidade da cifra
 - [ ] Play/pause mantidos; ao pausar, retoma na mesma posição
-- [ ] Preferências salvas por música (`artist/song`) em `localStorage`
-- [ ] Substituir o slider de “velocidade (ms)” pelo modo BPM (o modo antigo pode ficar como fallback opcional)
+- [ ] Preferências salvas por música (`bpm`, `linesPerBeat`, `bpmSource: 'getsong' | 'tap' | 'manual'`)
+- [ ] Substituir slider de “velocidade (ms)” pelo modo BPM (opção A — só BPM)
 
 ## Fora do escopo
 
 - Detecção automática de BPM via áudio/YouTube
-- Metrônomo sonoro (clique audível) — plano futuro opcional
-- Parser extrair BPM do Cifra Club (campo inexistente hoje no SSR)
+- Metrônomo sonoro (clique audível) — plano futuro
+- Parser extrair BPM do Cifra Club (campo inexistente no SSR)
 - Sincronização com vídeo do YouTube embutido
+- Integração primária com FreqBlog, AcousticBrainz ou Spotify
+- Modo legado “velocidade em ms” (toggle manual — ver WEB.md opção B, **não** implementar salvo pedido)
 
 ## Fórmula de referência
 
@@ -49,28 +83,44 @@ beatIntervalMs = 60_000 / bpm
 scrollPerBeat  = lineHeight * linesPerBeat   // linesPerBeat default: 1
 
 // a cada beatIntervalMs:
-element.scrollTop += scrollPerBeat
+window.scrollBy(0, scrollPerBeat)
 ```
 
 Calibração fina: `linesPerBeat` de 0.5 a 4 (step 0.25).
 
+## Fluxo de dados
+
+```
+SongPage carrega cifra
+    → GET /api/bpm?artist=…&song=…
+        → cache servidor (opcional, TTL 24h)
+        → GetSongBPM GET /search/?type=both&lookup={song}+{artist}
+        → normalizar tempo → bpm
+    → web pré-preenche BPM + exibe fonte
+    → usuário pode tap tempo ou editar manualmente
+    → auto-scroll usa bpm efetivo
+    → prefs persistidas em localStorage
+```
+
 ## Arquivos de implementação
 
-- [WEB.md](./WEB.md) — hook, UI, persistência
-- [MANUAL.md](./MANUAL.md) — casos de teste manual
+- [API.md](./API.md) — proxy GetSongBPM, env, cache, curl
+- [WEB.md](./WEB.md) — hook, UI, persistência, backlink
+- [MANUAL.md](./MANUAL.md) — casos de teste manual + curl
 
 ## Relação com outros planos
 
 | Plano | Relação |
 |-------|---------|
-| 05 (5b) | Substitui/evolui o auto-scroll por velocidade fixa |
+| 05 (5b) | Substitui auto-scroll por velocidade fixa |
 | 05 (5e) | `fontSize` afeta `lineHeight` → recalcular `scrollPerBeat` |
-| 06 | Lógica pura de BPM pode ir em `packages/shared/lib/scroll-bpm.ts` se reutilizada no mobile |
+| 06 | Lógica pura de BPM/scroll em `packages/shared` se reutilizada no mobile |
 
 ## Ordem sugerida de implementação
 
-1. `shared/lib/scroll-bpm.ts` — funções puras (`beatIntervalMs`, `tapTempo`, média)
-2. `use-auto-scroll-bpm.ts` — substituir ou conviver com `use-auto-scroll.ts`
-3. UI: BPM input, tap tempo, lines per beat
-4. Persistência por música
-5. Remover ou ocultar slider de velocidade legado
+1. `packages/shared` — `scroll-bpm.ts` + tipos GetSongBPM + testes
+2. `apps/api` — cliente GetSongBPM + rota `/api/bpm`
+3. `apps/web` — entity/feature fetch-bpm + cache local
+4. `use-auto-scroll-bpm.ts` + UI (BPM, tap, lines per beat)
+5. Backlink GetSongBPM na sidebar
+6. Remover slider de velocidade legado

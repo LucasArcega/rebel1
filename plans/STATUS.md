@@ -12,12 +12,15 @@
 | 06 | [self-hosted](./06-self-hosted/README.md) | **Parcial** (Node mantido) | `cursor/plan-features-complete-8862` |
 | 07 | [auto-scroll-bpm](./07-auto-scroll-bpm/README.md) | Planejado | — |
 | 08 | [dicionario-acordes-variacoes](./08-dicionario-acordes-variacoes/README.md) | Planejado | — |
+| 09 | [busca-local-e-filtros](./09-busca-local-e-filtros/README.md) | Planejado | — |
 
 ## Próximos planos
 
-**07 — auto-scroll BPM** — substituir slider de velocidade por rolagem sincronizada a batidas (BPM + tap tempo).
+**07 — auto-scroll BPM** — rolagem sincronizada a batidas; BPM automático via [GetSongBPM](https://getsongbpm.com/api) (proxy em `apps/api`) + tap tempo + fallback manual.
 
 **08 — dicionário de acordes e variações** — reconhecer acordes como entidades musicais e exibir diagramas SVG com formas alternativas.
+
+**09 — busca local e filtros** — filtro instantâneo na biblioteca offline; busca híbrida (salvas primeiro + Solr deduplicado).
 
 ## Arquitetura final
 
