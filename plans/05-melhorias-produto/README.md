@@ -1,50 +1,39 @@
 # Plano 05: melhorias de produto
 
-**Status:** Parcial (5a implementado)
-**Dependências:** 02 estável (para transposição em tablaturas)
+**Status:** Implementado
+**Dependências:** 02
 
-## Contexto
+## Critérios de aceite
 
-Funcionalidades e limitações que não são bugs de parser, mas afetam a experiência.
-
-## Critérios de aceite (por sub-fase)
-
-Implementar em tickets/planos filhos ou fases incrementais:
-
-### 5a — Transposição (prioridade 1)
+### 5a — Transposição + capo ✅
 
 - [x] UI para subir/descer semitons
-- [x] Transposição aplicada no conteúdo exibido (cifra com acordes)
-- [x] Versão offline salva sem alterar tom original
-- [x] Capotraste (casas 0–11) com transposição efetiva
+- [x] Transposição no conteúdo exibido
+- [x] Offline salva original
+- [x] Capotraste (casas 0–11)
 
-### 5b — Auto-scroll
+### 5b — Auto-scroll ✅ (será evoluído pelo plano 07)
 
-- [ ] Play/pause de rolagem com velocidade ajustável
+- [x] Play/pause de rolagem
+- [x] Velocidade ajustável (ms) — **legado**; ver [07-auto-scroll-bpm](../07-auto-scroll-bpm/README.md)
 
-### 5c — Offline avançado
+### 5c — Offline avançado ✅
 
-- [ ] Botão "Salvar para offline" explícito
-- [ ] Indicador de quantidade de cifras salvas
+- [x] Botão "Salvar offline" explícito
+- [x] Contador de cifras salvas no header (`Salvas N`)
 
-## Fora do escopo
+### 5d — Robustez scraping ✅
 
-- Login / sync Cifra Club
-- Contribuir/editar cifras
-- App mobile nativo
-- Player de áudio (link YouTube já existe)
+- [x] Testes unitários do parser (`packages/shared`, vitest)
+- [x] Log quando parser falha (HTML 200)
 
-## Sub-planos sugeridos (futuro)
+### 5e — Apresentação ✅
 
-| ID | Foco |
-|----|------|
-| 05a | Transposição |
-| 05b | Auto-scroll |
-| 05c | Offline avançado |
-| 05d | Robustez scraping |
-| 05e | Apresentação (fonte, tema, impressão) |
-| 05f | Busca avançada |
+- [x] Tamanho de fonte (sm/md/lg)
+- [x] Tema claro/escuro
+- [x] Impressão (`@media print`)
 
-## Arquivos de implementação
+### 5f — Busca ✅
 
-Criar `WEB.md` / `API.md` / `MANUAL.md` ao iniciar cada sub-fase.
+- [x] Histórico de buscas recentes (localStorage)
+- [x] Formulário na página `/search` + contagem de resultados
