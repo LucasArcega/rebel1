@@ -1,6 +1,8 @@
 import type { Page, Route } from '@playwright/test';
 import {
+  bassChordSongFixture,
   chordSongFixture,
+  simplifiedBassChordSongFixture,
   simplifiedChordSongFixture,
   type ChordSongFixture,
 } from '../fixtures/chord-song';
@@ -24,7 +26,15 @@ export const mockChordRoute = async (
 
 export const mockVersionedChordRoute = async (page: Page) => {
   await page.route(chordApiPattern, (route) => {
-    const version = new URL(route.request().url()).searchParams.get('version');
+    const params = new URL(route.request().url()).searchParams;
+    const instrument = params.get('instrument');
+    const version = params.get('version');
+    if (instrument === 'bass') {
+      return respondWithFixture(
+        route,
+        version === 'simplificada' ? simplifiedBassChordSongFixture : bassChordSongFixture,
+      );
+    }
     return respondWithFixture(
       route,
       version === 'simplificada' ? simplifiedChordSongFixture : chordSongFixture,

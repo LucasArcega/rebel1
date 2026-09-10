@@ -6,8 +6,7 @@ import { ChordDiagram } from '@/entities/chord-diagram';
 import type { FontSize } from '@/features/chord-display';
 import {
   FingeringPicker,
-  readFingeringPreference,
-  saveFingeringPreference,
+  useFingeringPreference,
 } from '@/features/select-chord-fingering';
 import {
   cleanChordContent,
@@ -31,23 +30,17 @@ interface PopoverPosition {
 }
 
 const ChordToken = ({ symbol, tuning }: { symbol: string; tuning?: string | null }) => {
-  const anchorRef = useRef<HTMLSpanElement>(null);
+  const anchorRef = useRef<HTMLButtonElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const popoverId = useId();
   const normalizedSymbol = parseChordSymbol(symbol)?.normalized ?? symbol;
   const fingerings = useMemo(() => findFingerings(symbol, tuning), [symbol, tuning]);
-  const [selectedId, setSelectedId] = useState(() =>
-    readFingeringPreference(normalizedSymbol, fingerings) ?? fingerings[0]?.id ?? '',
-  );
+  const { selectedId, selectFingering } = useFingeringPreference(normalizedSymbol, fingerings);
   const [visible, setVisible] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [position, setPosition] = useState<PopoverPosition | null>(null);
   const fingering = fingerings.find((item) => item.id === selectedId) ?? fingerings[0];
-
-  useEffect(() => {
-    setSelectedId(readFingeringPreference(normalizedSymbol, fingerings) ?? fingerings[0]?.id ?? '');
-  }, [fingerings, normalizedSymbol]);
 
   useEffect(() => () => {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
@@ -81,6 +74,19 @@ const ChordToken = ({ symbol, tuning }: { symbol: string; tuning?: string | null
     };
   }, [updatePosition, visible]);
 
+  useEffect(() => {
+    if (!visible) return;
+
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      const target = event.target as Node | null;
+      if (anchorRef.current?.contains(target) || popoverRef.current?.contains(target)) return;
+      setVisible(false);
+    };
+
+    document.addEventListener('pointerdown', closeOnOutsidePointer, true);
+    return () => document.removeEventListener('pointerdown', closeOnOutsidePointer, true);
+  }, [visible]);
+
   const cancelClose = () => {
     if (!closeTimerRef.current) return;
     clearTimeout(closeTimerRef.current);
@@ -102,22 +108,33 @@ const ChordToken = ({ symbol, tuning }: { symbol: string; tuning?: string | null
 
   return (
     <>
-      <span
+      <button
+        type="button"
         ref={anchorRef}
         className="chord-token chord-token--previewable"
-        tabIndex={0}
         aria-label={`Acorde ${symbol}. Diagrama e variações disponíveis`}
         aria-expanded={visible}
         aria-controls={visible ? popoverId : undefined}
         onMouseEnter={showPreview}
         onMouseLeave={scheduleClose}
         onFocus={showPreview}
+        onClick={showPreview}
+        onKeyDown={(event) => {
+          if (event.key === 'Tab' && !event.shiftKey && visible) {
+            const action = popoverRef.current?.querySelector<HTMLButtonElement>('button');
+            if (action) {
+              event.preventDefault();
+              action.focus();
+            }
+          }
+          if (event.key === 'Escape') setVisible(false);
+        }}
         onBlur={(event) => {
           if (!popoverRef.current?.contains(event.relatedTarget as Node | null)) scheduleClose();
         }}
       >
         {symbol}
-      </span>
+      </button>
       {visible && position && typeof document !== 'undefined' && createPortal(
         <div
           ref={popoverRef}
@@ -128,6 +145,16 @@ const ChordToken = ({ symbol, tuning }: { symbol: string; tuning?: string | null
           aria-label={`Diagrama e variações de ${symbol}`}
           onMouseEnter={cancelClose}
           onMouseLeave={scheduleClose}
+          onBlur={(event) => {
+            const next = event.relatedTarget as Node | null;
+            if (!popoverRef.current?.contains(next) && next !== anchorRef.current) scheduleClose();
+          }}
+          onKeyDown={(event) => {
+            if (event.key !== 'Escape') return;
+            event.preventDefault();
+            setVisible(false);
+            anchorRef.current?.focus();
+          }}
         >
           <ChordDiagram symbol={symbol} fingering={fingering} size="sm" />
           <button
@@ -151,10 +178,7 @@ const ChordToken = ({ symbol, tuning }: { symbol: string; tuning?: string | null
           selectedId={fingering.id}
           openerRef={anchorRef}
           onClose={() => setPickerOpen(false)}
-          onSelect={(fingeringId) => {
-            setSelectedId(fingeringId);
-            saveFingeringPreference(normalizedSymbol, fingeringId);
-          }}
+          onSelect={selectFingering}
         />,
         document.body,
       )}

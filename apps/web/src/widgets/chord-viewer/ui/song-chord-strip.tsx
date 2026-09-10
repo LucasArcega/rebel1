@@ -4,8 +4,7 @@ import { findFingerings, isStandardGuitarTuning, parseChordSymbol } from '@cifra
 import { ChordDiagram } from '@/entities/chord-diagram';
 import {
   FingeringPicker,
-  readFingeringPreference,
-  saveFingeringPreference,
+  useFingeringPreference,
 } from '@/features/select-chord-fingering';
 import { uniqueChordOccurrences } from '../lib/unique-chord-occurrences';
 
@@ -38,9 +37,7 @@ const ChordCard = ({
     () => findFingerings(occurrence.symbol, tuning),
     [occurrence.symbol, tuning],
   );
-  const [selectedId, setSelectedId] = useState(() =>
-    readFingeringPreference(normalizedSymbol, fingerings) ?? fingerings[0]?.id ?? '',
-  );
+  const { selectedId, selectFingering } = useFingeringPreference(normalizedSymbol, fingerings);
   const openerRef = useRef<HTMLButtonElement>(null);
   const selected = fingerings.find((fingering) => fingering.id === selectedId) ?? fingerings[0];
 
@@ -51,10 +48,7 @@ const ChordCard = ({
       fingerings,
       selectedId: selected.id,
       opener: openerRef.current,
-      select: (fingeringId) => {
-        setSelectedId(fingeringId);
-        saveFingeringPreference(normalizedSymbol, fingeringId);
-      },
+      select: selectFingering,
     });
   };
 

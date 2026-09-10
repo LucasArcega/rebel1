@@ -21,6 +21,14 @@ const versions = [
     instrumentSlug: 'cifra-group',
     path: '/fixture-artist/diagramas/simplificada.html',
   },
+  {
+    id: 32276,
+    label: 'Principal',
+    labelSlug: 'principal',
+    instrument: 'Baixo',
+    instrumentSlug: 'bass',
+    path: '/fixture-artist/diagramas/tabs-baixo/',
+  },
 ] as const;
 
 const baseSong = {
@@ -83,4 +91,39 @@ export const simplifiedChordSongFixture = {
   ] satisfies ChordOccurrenceFixture[],
 };
 
-export type ChordSongFixture = typeof chordSongFixture | typeof legacyChordSongFixture;
+export const bassChordSongFixture = {
+  ...baseSong,
+  versionId: 32276,
+  tone: 'A',
+  content: [
+    'Q    Q    Q    Q',
+    'G||----------------------|',
+    'D||--3----3----3----3----|',
+    'A||----------------------|',
+    'D||----------------------|',
+    '',
+    '----------------------|',
+    '--2----2----2----2----|',
+    '----------------------|',
+    '----------------------|',
+  ].join('\n'),
+  versions: [
+    versions[2],
+    {
+      id: 33534,
+      label: 'Simplificada',
+      labelSlug: 'simplificada',
+      instrument: 'Baixo',
+      instrumentSlug: 'bass',
+      path: '/fixture-artist/diagramas/tabs-baixo/simplificada.html',
+    },
+  ],
+};
+
+export const simplifiedBassChordSongFixture = {
+  ...bassChordSongFixture,
+  versionId: 33534,
+  content: '(afinação GDAD)\n\n(intro) (00:00)\nG|---0---2---|\nD|-----------|\nA|---3---5---|\nD|-----------|',
+};
+
+export type ChordSongFixture = typeof chordSongFixture | typeof legacyChordSongFixture | typeof bassChordSongFixture;

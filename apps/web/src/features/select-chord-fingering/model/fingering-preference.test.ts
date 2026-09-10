@@ -1,6 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { ChordFingering } from '@cifra-hub/shared';
-import { readFingeringPreference, saveFingeringPreference } from './fingering-preference';
+import {
+  readFingeringPreference,
+  saveFingeringPreference,
+  subscribeFingeringPreference,
+} from './fingering-preference';
 
 const fingering = { id: 'am-open' } as ChordFingering;
 
@@ -44,5 +48,18 @@ describe('fingering preference', () => {
     expect(() => saveFingeringPreference('Am', 'am-open')).not.toThrow();
     expect(readFingeringPreference('Am', [fingering])).toBeNull();
   });
-});
 
+  it('notifies mounted consumers of a preference changed in the same window', () => {
+    const localStorage = createStorage();
+    const browserWindow = Object.assign(new EventTarget(), { localStorage });
+    vi.stubGlobal('window', browserWindow);
+    const listener = vi.fn();
+    const unsubscribe = subscribeFingeringPreference('Am', listener);
+
+    saveFingeringPreference('Am', 'am-open');
+    saveFingeringPreference('C', 'c-open');
+
+    expect(listener).toHaveBeenCalledOnce();
+    unsubscribe();
+  });
+});

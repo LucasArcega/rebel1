@@ -32,12 +32,18 @@ const LYRIC_CHORD_INSTRUMENTS = new Set<InstrumentSlug>([
   'viola',
 ]);
 const TAB_MARKER_PATTERN = /#\/?t\d+#/g;
+const TAB_BLOCK_PATTERN = /(?:^[ \t]*\[Tab[^\]]*\][ \t]*\r?\n)?#t(\d+)#[\s\S]*?#\/t\1#[ \t]*(?:\r?\n)?/gim;
 
-const decodeRscChunk = (chunk: string): string =>
-  chunk
-    .replace(/\\n/g, '\n')
-    .replace(/\\"/g, '"')
-    .replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+const decodeRscChunk = (chunk: string): string => {
+  try {
+    return JSON.parse(`"${chunk}"`) as string;
+  } catch {
+    return chunk
+      .replace(/\\n/g, '\n')
+      .replace(/\\"/g, '"')
+      .replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+  }
+};
 
 const extractRscChunks = (html: string): string[] => {
   const chunks: string[] = [];
@@ -64,7 +70,11 @@ const stripChordHtml = (value: string): string =>
     .replace(/&gt;/g, '>');
 
 const cleanExtractedContent = (value: string): string =>
-  decodeChordEntities(value).replace(TAB_MARKER_PATTERN, '').replace(/\n{3,}/g, '\n\n').trim();
+  decodeChordEntities(value)
+    .replace(TAB_BLOCK_PATTERN, '')
+    .replace(TAB_MARKER_PATTERN, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 
 const sliceUntilMarkers = (chunk: string, start: number, stops = CHUNK_STOP_MARKERS): string => {
   let end = chunk.length;
@@ -188,15 +198,16 @@ const extractGenericTablatureContent = (chunk: string): string | null => {
   if (!TAB_LINE_PATTERN.test(chunk)) return null;
 
   const match = chunk.match(/^(?:Intro|Vers[oõ]|Refr[aã]o|\d+:\d+)?\s*\n?[EADGB]\|/m);
-  const start = match?.index ?? chunk.search(/[EADGB]\|/);
-  if (start === -1) return null;
+  const tabStart = match?.index ?? chunk.search(/[EADGB]\|/);
+  if (tabStart === -1) return null;
+
+  const prefix = chunk.slice(0, tabStart);
+  const start = prefix.length <= 500 && !/[{<]/.test(prefix) ? 0 : tabStart;
 
   const slice = sliceUntilMarkers(chunk, start, TABLATURE_STOP_MARKERS);
-  const tabLines = slice.split('\n').filter((line) => /^[EADGB]\|/.test(line) || line.trim() === '' || /^\d+:\d+$/.test(line.trim()) || /^(Intro|Verso|Refrão)/i.test(line.trim()));
+  if ((slice.match(/^[EADGB]\|/gm) ?? []).length < 2) return null;
 
-  if (tabLines.filter((line) => /^[EADGB]\|/.test(line)).length < 2) return null;
-
-  const extracted = cleanExtractedContent(tabLines.join('\n'));
+  const extracted = cleanExtractedContent(slice);
   return extracted || null;
 };
 
@@ -266,10 +277,12 @@ export const buildVersionPath = (
   labelSlug: string,
 ): string => {
   const instrumentSuffix = INSTRUMENT_PATHS[instrumentSlug] ?? '';
-  const versionSuffix =
-    instrumentSlug === 'cifra-group' && labelSlug !== 'principal' ? `/${labelSlug}` : '';
+  const basePath = `/${artistSlug}/${songSlug}${instrumentSuffix}`;
+  const isDefaultVersion = labelSlug === 'principal' || labelSlug === 'original';
 
-  return `/${artistSlug}/${songSlug}${instrumentSuffix}${versionSuffix}/`;
+  if (isDefaultVersion) return `${basePath}/`;
+  if (instrumentSlug === 'cifra-group') return `${basePath}/${labelSlug}/`;
+  return `${basePath}/${labelSlug}.html`;
 };
 
 const extractPriorityVersions = (text: string, artistSlug: string, songSlug: string): ChordVersion[] => {

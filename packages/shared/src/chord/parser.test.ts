@@ -4,7 +4,7 @@ import { buildFetchUrl, buildVersionPath, parseCifraClubHtml } from './parser.js
 const BASE = 'https://www.cifraclub.com.br';
 
 const wrapChunk = (content: string) =>
-  `<script>self.__next_f.push([1,"${content.replace(/"/g, '\\"').replace(/\n/g, '\\n')}"])</script>`;
+  `<script>self.__next_f.push([1,${JSON.stringify(content)}])</script>`;
 
 const CHORD_HTML = [
   wrapChunk('[Primeira Parte]\\n\\n<b>Dm7</b>             <b>Bb9</b>\\n    Come up to meet you'),
@@ -23,7 +23,7 @@ const LYRICS_HTML = [
 ].join('');
 
 const BASS_HTML = [
-  wrapChunk('Intro\\nG|---------9~~|\\nD|-7~~-10r--------|'),
+  wrapChunk('Intro\nG|---------9~~|\nD|-7~~-10r--------|'),
   wrapChunk(
     '{"songData":{"priorityVersions":[],"artist":{"name":"A7X"},"song":{"name":"Buried Alive"},"id":1,"status":0}}',
   ),
@@ -45,6 +45,15 @@ describe('buildVersionPath', () => {
     );
     expect(buildFetchUrl(BASE, 'coldplay', 'the-scientist', 'keyboard')).toBe(
       `${BASE}/coldplay/the-scientist/teclado/`,
+    );
+    expect(buildFetchUrl(BASE, 'avenged-sevenfold', 'dear-god', 'bass', 'principal')).toBe(
+      `${BASE}/avenged-sevenfold/dear-god/tabs-baixo/`,
+    );
+    expect(buildFetchUrl(BASE, 'avenged-sevenfold', 'dear-god', 'bass', 'simplificada')).toBe(
+      `${BASE}/avenged-sevenfold/dear-god/tabs-baixo/simplificada.html`,
+    );
+    expect(buildFetchUrl(BASE, 'coldplay', 'the-scientist', 'lyrics', 'original')).toBe(
+      `${BASE}/coldplay/the-scientist/letra/`,
     );
   });
 });
@@ -86,6 +95,34 @@ describe('parseCifraClubHtml', () => {
     expect(result?.chords).toBeUndefined();
   });
 
+  it('preserves rhythm rows and continuation staves in bass tablature', () => {
+    const continuation = [
+      wrapChunk([
+        '     Q    Q    Q    Q',
+        'G||----------------------|',
+        'D||--3----3----3----3----|',
+        'A||----------------------|',
+        'D||----------------------|',
+        '',
+        '  Q    Q    Q    Q',
+        '----------------------|',
+        '--2----2----2----2----|',
+        '----------------------|',
+        '----------------------|',
+        '\\n/ - tremolo bar dip',
+      ].join('\n')),
+      wrapChunk(
+        '{"songData":{"priorityVersions":[],"artist":{"name":"A7X"},"song":{"name":"Dear God"},"id":32276,"status":0}}',
+      ),
+    ].join('');
+
+    const result = parseCifraClubHtml(continuation, 'avenged-sevenfold', 'dear-god', BASE, 'bass');
+    expect(result?.content).toContain('Q    Q    Q    Q');
+    expect(result?.content).toContain('--2----2----2----2----|');
+    expect(result?.content).toContain('\\n/ - tremolo bar dip');
+    expect(result?.content.split('\n')).toHaveLength(12);
+  });
+
   it('parses keyboard like cifra when chord content exists', () => {
     const result = parseCifraClubHtml(CHORD_HTML, 'coldplay', 'the-scientist', BASE, 'keyboard');
     expect(result?.content).toContain('Dm7');
@@ -113,6 +150,8 @@ describe('parseCifraClubHtml', () => {
     expect(result?.content).toContain('<b>D7M</b>');
     expect(result?.content).toContain('[Primeira Parte]');
     expect(result?.content).toContain("Hello I've waited here for you");
+    expect(result?.content).not.toContain('[Tab - Intro]');
+    expect(result?.content).not.toContain('E|----------|');
     expect(result?.chords?.map((chord) => chord.symbol)).toEqual(['D7M', 'B2']);
   });
 });

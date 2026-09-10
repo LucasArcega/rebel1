@@ -73,7 +73,13 @@ export const FingeringPicker = ({ symbol, fingerings, selectedId, openerRef, onS
     <div className="fingering-picker__backdrop" onMouseDown={(event) => {
       if (event.target === event.currentTarget) close();
     }}>
-      <div ref={dialogRef} className="fingering-picker" role="dialog" aria-modal="true" aria-label={`Variações de ${symbol}`}>
+      <div
+        ref={dialogRef}
+        className={`fingering-picker${fingerings.length === 1 ? ' fingering-picker--compact' : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Variações de ${symbol}`}
+      >
         <header className="fingering-picker__header">
           <div>
             <h2>Variações de {symbol}</h2>

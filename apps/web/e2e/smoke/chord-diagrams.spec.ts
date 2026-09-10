@@ -59,6 +59,33 @@ test.describe('dicionário de acordes', () => {
       .toHaveAttribute('aria-checked', 'true');
   });
 
+  test('mostra o hover acima da interface e mantém uma única forma em modal compacto', async ({ page }) => {
+    await page.goto(songUrl);
+
+    const inlineChord = page.getByRole('button', {
+      name: 'Acorde D9/F#. Diagrama e variações disponíveis',
+    });
+    await inlineChord.hover();
+
+    const preview = page.getByRole('group', { name: 'Diagrama e variações de D9/F#' });
+    await expect(preview).toBeVisible();
+    await expect(preview).toHaveCSS('position', 'fixed');
+    expect(Number(await preview.evaluate((element) => getComputedStyle(element).zIndex))).toBeGreaterThan(100);
+
+    const bounds = await preview.boundingBox();
+    const viewport = page.viewportSize();
+    expect(bounds).not.toBeNull();
+    expect(viewport).not.toBeNull();
+    expect(bounds!.x).toBeGreaterThanOrEqual(0);
+    expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(viewport!.width);
+
+    await preview.getByRole('button', { name: 'Ver detalhes' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Variações de D9/F#' });
+    await expect(dialog).toBeVisible();
+    expect((await dialog.boundingBox())!.width).toBeLessThanOrEqual(320);
+    expect((await dialog.locator('.chord-diagram').boundingBox())!.width).toBeLessThanOrEqual(198);
+  });
+
   test('descarta uma preferência inexistente sem quebrar o card', async ({ page }) => {
     await page.addInitScript(() => {
       localStorage.setItem('chord-fingering/guitar/E-A-D-G-B-E/Am', 'forma-removida');

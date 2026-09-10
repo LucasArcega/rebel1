@@ -685,8 +685,12 @@ a:hover {
 
 .chord-token--previewable {
   position: relative;
+  padding: 0;
+  border: 0;
   border-radius: 3px;
+  background: transparent;
   cursor: help;
+  font: inherit;
   outline: none;
 }
 
@@ -821,7 +825,7 @@ a:hover {
   color: var(--text);
 }
 
-.chord-diagram--sm { min-width: 72px; }
+.chord-diagram--sm { min-width: 72px; max-width: 198px; }
 .chord-diagram--md { max-width: 180px; }
 .chord-diagram--lg { max-width: 240px; }
 
@@ -896,6 +900,10 @@ a:hover {
   border-radius: var(--radius);
   background: var(--surface);
   box-shadow: var(--shadow);
+}
+
+.fingering-picker.fingering-picker--compact {
+  width: min(320px, 100%);
 }
 
 .fingering-picker__header {
@@ -1099,5 +1107,11 @@ a:hover {
     width: 100%;
     max-height: min(78dvh, 680px);
     border-radius: var(--radius) var(--radius) 0 0;
+  }
+
+  .fingering-picker.fingering-picker--compact {
+    width: min(320px, calc(100% - 1.5rem));
+    margin-bottom: 0.75rem;
+    border-radius: var(--radius);
   }
 }

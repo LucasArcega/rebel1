@@ -13,3 +13,18 @@ test('trocar de versão substitui a lista de acordes anterior', async ({ page })
   await expect(strip.locator('.chord-diagram__title')).toHaveText(['G', 'D', 'Em']);
   await expect(strip.getByText('Am', { exact: true })).toHaveCount(0);
 });
+
+test('abre baixo principal e simplificada a partir das versões descobertas', async ({ page }) => {
+  await mockVersionedChordRoute(page);
+  await page.goto('/artists/fixture-artist/songs/diagramas');
+
+  const bassGroup = page.locator('.version-selector__group').filter({ hasText: 'Baixo' });
+  await bassGroup.getByRole('button', { name: 'Principal' }).click();
+  await expect(page).toHaveURL(/instrument=bass/);
+  await expect(page.getByText('G||----------------------|', { exact: true })).toBeVisible();
+  await expect(page.getByText('--2----2----2----2----|', { exact: true })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Simplificada' }).click();
+  await expect(page).toHaveURL(/instrument=bass.*version=simplificada/);
+  await expect(page.getByText('(afinação GDAD)', { exact: true })).toBeVisible();
+});

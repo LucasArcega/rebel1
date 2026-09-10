@@ -1,4 +1,5 @@
-import { buildFetchUrl, parseCifraClubHtml } from '../../../entities/chord/lib/parser.js';
+import { findBassVersionId } from '@cifra-hub/shared';
+import { buildFetchUrl, buildVersionPath, parseCifraClubHtml } from '../../../entities/chord/lib/parser.js';
 import type { InstrumentSlug } from '../../../entities/chord/model/types.js';
 import { env } from '../../../shared/config/env.js';
 
@@ -35,6 +36,7 @@ export const getChord = async (params: {
   instrument?: InstrumentSlug;
   version?: string;
 }) => {
+  const selectedInstrument = params.instrument ?? 'cifra-group';
   const url = buildFetchUrl(
     env.CIFRACLUB_BASE_URL,
     params.artist,
@@ -43,7 +45,19 @@ export const getChord = async (params: {
     params.version,
   );
 
-  const response = await fetch(url, { headers: BROWSER_HEADERS });
+  const bassVersionPromise = selectedInstrument === 'cifra-group'
+    ? findBassVersionId(params.artist, params.song).catch((error) => {
+        console.warn(
+          `[versions] bass discovery failed artist=${params.artist} song=${params.song}`,
+          error,
+        );
+        return null;
+      })
+    : Promise.resolve(null);
+  const [response, indexedBassVersionId] = await Promise.all([
+    fetch(url, { headers: BROWSER_HEADERS }),
+    bassVersionPromise,
+  ]);
 
   if (response.status === 404) {
     throw new ChordRequestError('NOT_FOUND_ON_CC', 'Transcrição não disponível no Cifra Club');
@@ -59,7 +73,7 @@ export const getChord = async (params: {
     params.artist,
     params.song,
     env.CIFRACLUB_BASE_URL,
-    params.instrument ?? 'cifra-group',
+    selectedInstrument,
     params.version ?? 'principal',
   );
 
@@ -71,6 +85,20 @@ export const getChord = async (params: {
       'PARSE_FAILED',
       'Este instrumento ou versão ainda não é suportado pelo parser',
     );
+  }
+
+  if (
+    indexedBassVersionId &&
+    !parsed.versions.some((version) => version.instrumentSlug === 'bass')
+  ) {
+    parsed.versions.push({
+      id: indexedBassVersionId,
+      label: 'Principal',
+      labelSlug: 'principal',
+      instrument: 'Baixo',
+      instrumentSlug: 'bass',
+      path: buildVersionPath(params.artist, params.song, 'bass', 'principal'),
+    });
   }
 
   return parsed;
