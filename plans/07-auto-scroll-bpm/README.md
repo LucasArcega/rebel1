@@ -1,6 +1,6 @@
 # Plano 07: auto-scroll baseado em BPM
 
-**Status:** Em progresso
+**Status:** Implementado
 **Dependências:** 05 (auto-scroll atual), 01–02 (cifra com linhas parseáveis)
 
 ## Contexto

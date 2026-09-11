@@ -111,6 +111,6 @@ npm run typecheck
 
 ## Checklist de conformidade GetSongBPM
 
-- [ ] Link para https://getsongbpm.com visível no app quando BPM veio da API
-- [ ] API key apenas no servidor (`apps/api/.env`)
-- [ ] Cache implementado para respeitar rate limit (3k/h)
+- [ ] Link para https://getsongbpm.com visível no app quando BPM veio da API (não exercido — sem `GETSONGBPM_API_KEY` neste ambiente)
+- [x] API key apenas no servidor (`apps/api/.env`)
+- [x] Cache implementado para respeitar rate limit (3k/h)
