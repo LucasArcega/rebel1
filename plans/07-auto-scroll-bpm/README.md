@@ -1,6 +1,6 @@
 # Plano 07: auto-scroll baseado em BPM
 
-**Status:** Planejado
+**Status:** Em progresso
 **Dependências:** 05 (auto-scroll atual), 01–02 (cifra com linhas parseáveis)
 
 ## Contexto
@@ -49,23 +49,23 @@ fallback → tap tempo + input manual
 
 ### BPM automático (GetSongBPM)
 
-- [ ] Endpoint `GET /api/bpm?artist={slug}&song={slug}` no `apps/api` (proxy — **nunca** expor API key no web)
-- [ ] Variável de ambiente `GETSONGBPM_API_KEY` (documentada em `.env.example`)
-- [ ] Resposta normalizada: `{ bpm, key?, timeSig?, source: 'getsongbpm' | 'cache' }` ou `404` quando não encontrado
-- [ ] Ao abrir uma música, buscar BPM e **pré-preencher** o controle de auto-scroll
-- [ ] Estados UI: carregando / encontrado / não encontrado / erro de rede
-- [ ] **Backlink obrigatório** visível quando BPM veio do GetSong (ex.: rodapé da sidebar “BPM: GetSongBPM”)
-- [ ] Cache por música (`artistSlug/songSlug`) em `localStorage` + cache curto no servidor (evitar rate limit)
+- [x] Endpoint `GET /api/bpm?artist={slug}&song={slug}` no `apps/api` (proxy — **nunca** expor API key no web)
+- [x] Variável de ambiente `GETSONGBPM_API_KEY` (documentada em `.env.example`)
+- [x] Resposta normalizada: `{ bpm, key?, timeSig?, source: 'getsongbpm' | 'cache' }` ou `404` quando não encontrado
+- [x] Ao abrir uma música, buscar BPM e **pré-preencher** o controle de auto-scroll
+- [x] Estados UI: carregando / encontrado / não encontrado / erro de rede
+- [x] **Backlink obrigatório** visível quando BPM veio do GetSong (ex.: rodapé da sidebar “BPM: GetSongBPM”)
+- [x] Cache por música (`artistSlug/songSlug`) em `localStorage` + cache curto no servidor (evitar rate limit)
 
 ### Rolagem sincronizada
 
-- [ ] Controle de BPM (input numérico + slider, faixa 40–240)
-- [ ] **Tap tempo**: 3+ toques calculam BPM médio e preenchem o campo (sobrescreve valor buscado)
-- [ ] Rolagem sincronizada: a cada batida, `scrollTop += pixelsPerBeat`
-- [ ] Ajuste de **linhas por batida** (0.5–4, step 0.25) para calibrar densidade da cifra
-- [ ] Play/pause mantidos; ao pausar, retoma na mesma posição
-- [ ] Preferências salvas por música (`bpm`, `linesPerBeat`, `bpmSource: 'getsong' | 'tap' | 'manual'`)
-- [ ] Substituir slider de “velocidade (ms)” pelo modo BPM (opção A — só BPM)
+- [x] Controle de BPM (input numérico + slider, faixa 40–240)
+- [x] **Tap tempo**: 3+ toques calculam BPM médio e preenchem o campo (sobrescreve valor buscado)
+- [x] Rolagem sincronizada: a cada batida, `scrollTop += pixelsPerBeat`
+- [x] Ajuste de **linhas por batida** (0.5–4, step 0.25) para calibrar densidade da cifra
+- [x] Play/pause mantidos; ao pausar, retoma na mesma posição
+- [x] Preferências salvas por música (`bpm`, `linesPerBeat`, `bpmSource: 'getsong' | 'tap' | 'manual'`)
+- [x] Substituir slider de “velocidade (ms)” pelo modo BPM (opção A — só BPM)
 
 ## Fora do escopo
 

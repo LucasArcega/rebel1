@@ -23,3 +23,31 @@ export { computeBaseFret } from './fingering/base-fret.js';
 export { fingeringPreferenceStorageKey, STANDARD_GUITAR_TUNING_KEY } from './fingering/fingering-key.js';
 export { validateFingering } from './fingering/validate-fingering.js';
 export { findFingerings, isStandardGuitarTuning } from './fingering/find-fingerings.js';
+
+export type {
+  BpmLookupSource,
+  BpmSource,
+  GetSongBpmHit,
+  GetSongBpmLookupResult,
+} from './bpm/types.js';
+export {
+  DEFAULT_BPM,
+  DEFAULT_LINES_PER_BEAT,
+  GETSONGBPM_ATTRIBUTION,
+  LINES_PER_BEAT_STEP,
+  MAX_BPM,
+  MAX_LINES_PER_BEAT,
+  MAX_PROVIDER_BPM,
+  MIN_BPM,
+  MIN_LINES_PER_BEAT,
+  MIN_PROVIDER_BPM,
+} from './bpm/types.js';
+export { normalizeSearchText, scoreNameMatch, scoreSongMatch, slugToSearchName } from './bpm/normalize-search.js';
+export { beatIntervalMs, calculateTapTempoBpm, clampBpm, clampLinesPerBeat, scrollPerBeat } from './bpm/scroll-bpm.js';
+export {
+  GetSongBpmProviderError,
+  lookupGetSongBpm,
+  parseGetSongSearchPayload,
+  pickBestGetSongMatch,
+  searchGetSongBpm,
+} from './bpm/getsongbpm-client.js';

@@ -550,7 +550,23 @@ a:hover {
   border-radius: var(--radius);
 }
 
+.auto-scroll {
+  display: grid;
+  gap: 0.65rem;
+  align-items: stretch;
+}
+
+.auto-scroll__header,
+.auto-scroll__actions,
+.auto-scroll__bpm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  align-items: center;
+}
+
 .auto-scroll__label,
+.auto-scroll__field,
 .chord-display-controls__group {
   font-size: 0.8rem;
   color: var(--muted);
@@ -558,8 +574,49 @@ a:hover {
   gap: 0.25rem;
 }
 
-.auto-scroll__speed input {
+.auto-scroll__badge {
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.auto-scroll__bpm input[type='number'] {
+  width: 4.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  padding: 0.3rem 0.45rem;
+  font: inherit;
+}
+
+.auto-scroll__bpm input[type='range'],
+.auto-scroll__field input[type='range'] {
   width: 120px;
+}
+
+.auto-scroll__hint,
+.auto-scroll__message,
+.getsong-attribution {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.auto-scroll__message {
+  margin: 0;
+}
+
+.getsong-attribution {
+  margin: 0;
+}
+
+.getsong-attribution a {
+  color: var(--text);
 }
 
 .chord-display-controls select {
@@ -615,7 +672,8 @@ a:hover {
 
 .chord-viewer__sidebar .chord-transpose,
 .chord-viewer__sidebar .auto-scroll,
-.chord-viewer__sidebar .chord-display-controls {
+.chord-viewer__sidebar .chord-display-controls,
+.chord-viewer__sidebar .getsong-attribution {
   padding: 0.65rem 0 0;
   background: transparent;
   border: none;

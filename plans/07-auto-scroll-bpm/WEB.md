@@ -31,51 +31,51 @@ AutoScrollBpmControls
 
 ### Entity `bpm`
 
-- [ ] `BpmLookupResult`: `{ bpm, key?, timeSig?, source, attribution? }`
-- [ ] `bpmApi.lookup(params)` → `GET /api/bpm?...`
+- [x] `BpmLookupResult`: `{ bpm, key?, timeSig?, source, attribution? }`
+- [x] `bpmApi.lookup(params)` → `GET /api/bpm?...`
 
 ### `useBpmQuery`
 
-- [ ] TanStack Query, `enabled` quando cifra carregou
-- [ ] `staleTime`: 24h (BPM estável)
-- [ ] Não retry agressivo em 404 (miss é esperado em MPB)
-- [ ] Cache key: `['bpm', artistSlug, songSlug]`
+- [x] TanStack Query, `enabled` quando cifra carregou
+- [x] `staleTime`: 24h (BPM estável)
+- [x] Não retry agressivo em 404 (miss é esperado em MPB)
+- [x] Cache key: `['bpm', artistSlug, songSlug]`
 
 ### Funções puras (`scroll-bpm.ts`)
 
-- [ ] `beatIntervalMs(bpm: number): number`
-- [ ] `scrollPerBeat(lineHeight: number, linesPerBeat: number): number`
-- [ ] `calculateTapTempoBpm(taps: number[]): number | null`
-- [ ] `clampBpm(bpm: number): number` — 40–240
+- [x] `beatIntervalMs(bpm: number): number`
+- [x] `scrollPerBeat(lineHeight: number, linesPerBeat: number): number`
+- [x] `calculateTapTempoBpm(taps: number[]): number | null`
+- [x] `clampBpm(bpm: number): number` — 40–240
 
 ### Hook `useAutoScrollBpm`
 
-- [ ] Props: `contentRef`, `lineHeight`, `initialBpm?`, `artistSlug`, `songSlug`
-- [ ] Estado: `bpm`, `linesPerBeat`, `isPlaying`, `bpmSource`
-- [ ] `useEffect` interval em `beatIntervalMs(bpm)` → `window.scrollBy(0, scrollPerBeat)`
-- [ ] Parar ao fim do documento
-- [ ] `initialBpm` do GetSong só aplica se `bpmSource !== 'manual' && !== 'tap'`
+- [x] Props: `contentRef`, `lineHeight`, `initialBpm?`, `artistSlug`, `songSlug`
+- [x] Estado: `bpm`, `linesPerBeat`, `isPlaying`, `bpmSource`
+- [x] `useEffect` interval em `beatIntervalMs(bpm)` → `window.scrollBy(0, scrollPerBeat)`
+- [x] Parar ao fim do documento
+- [x] `initialBpm` do GetSong só aplica se `bpmSource !== 'manual' && !== 'tap'`
 
 ### Tap tempo (`useTapTempo`)
 
-- [ ] Botão “Tap” — `Date.now()` por clique
-- [ ] Reset após 2s sem toque
-- [ ] 3+ toques → BPM → `bpmSource = 'tap'`
+- [x] Botão “Tap” — `Date.now()` por clique
+- [x] Reset após 2s sem toque
+- [x] 3+ toques → BPM → `bpmSource = 'tap'`
 
 ### UI (`AutoScrollBpmControls`)
 
-- [ ] Input + slider BPM (40–240)
-- [ ] Botão Tap tempo
-- [ ] Slider “Linhas por batida” (0.5–4)
-- [ ] Play / Pausar
-- [ ] Badge de origem: `GetSong` / `Tap` / `Manual` / `…` (loading)
-- [ ] Mensagem suave se 404: “BPM não encontrado — use tap ou informe manualmente”
+- [x] Input + slider BPM (40–240)
+- [x] Botão Tap tempo
+- [x] Slider “Linhas por batida” (0.5–4)
+- [x] Play / Pausar
+- [x] Badge de origem: `GetSong` / `Tap` / `Manual` / `…` (loading)
+- [x] Mensagem suave se 404: “BPM não encontrado — use tap ou informe manualmente”
 
 ### Backlink GetSongBPM (`getsong-attribution.tsx`)
 
-- [ ] Renderizar **somente** quando BPM veio de GetSong (API ou cache com source getsong)
-- [ ] Texto mínimo: `BPM via GetSongBPM` → link `https://getsongbpm.com` (`target="_blank"`, `rel="noreferrer"`)
-- [ ] Posição: rodapé da `chord-viewer__sidebar` (sempre visível quando aplicável)
+- [x] Renderizar **somente** quando BPM veio de GetSong (API ou cache com source getsong)
+- [x] Texto mínimo: `BPM via GetSongBPM` → link `https://getsongbpm.com` (`target="_blank"`, `rel="noreferrer"`)
+- [x] Posição: rodapé da `chord-viewer__sidebar` (sempre visível quando aplicável)
 
 ### Persistência (`scroll-bpm-storage.ts`)
 
@@ -93,16 +93,16 @@ interface ScrollBpmPrefs {
 // chave: scroll-bpm/{artistSlug}/{songSlug}
 ```
 
-- [ ] Carregar ao abrir música (prefs do usuário > cache GetSong > API)
-- [ ] Salvar ao alterar BPM, linesPerBeat ou source (debounce 300ms)
-- [ ] Cache GetSong local evita bater na API ao revisitar a mesma música
+- [x] Carregar ao abrir música (prefs do usuário > cache GetSong > API)
+- [x] Salvar ao alterar BPM, linesPerBeat ou source (debounce 300ms)
+- [x] Cache GetSong local evita bater na API ao revisitar a mesma música
 
 ### Integração `ChordViewer`
 
-- [ ] Passar slugs + nomes para `useBpmQuery` e `useAutoScrollBpm`
-- [ ] Substituir `AutoScrollControls` por `AutoScrollBpmControls`
-- [ ] `contentRef` no `chord-content-area` (scroll da página — já implementado)
-- [ ] Medir `lineHeight` via `ResizeObserver` em `.chord-line` ou constante por `fontSize`
+- [x] Passar slugs + nomes para `useBpmQuery` e `useAutoScrollBpm`
+- [x] Substituir `AutoScrollControls` por `AutoScrollBpmControls`
+- [x] `contentRef` no `chord-content-area` (scroll da página — já implementado)
+- [x] Medir `lineHeight` via `ResizeObserver` em `.chord-line` ou constante por `fontSize`
 
 ## Prioridade de BPM efetivo
 
@@ -138,8 +138,8 @@ export interface AutoScrollBpmState {
 
 ## Testes unitários (`packages/shared`)
 
-- [ ] `beatIntervalMs(120)` → `500`
-- [ ] `beatIntervalMs(60)` → `1000`
-- [ ] `calculateTapTempoBpm` — toques regulares 500ms → ~120
-- [ ] `calculateTapTempoBpm` — < 2 intervalos → `null`
-- [ ] Normalização resposta GetSongBPM (mock JSON)
+- [x] `beatIntervalMs(120)` → `500`
+- [x] `beatIntervalMs(60)` → `1000`
+- [x] `calculateTapTempoBpm` — toques regulares 500ms → ~120
+- [x] `calculateTapTempoBpm` — < 2 intervalos → `null`
+- [x] Normalização resposta GetSongBPM (mock JSON)

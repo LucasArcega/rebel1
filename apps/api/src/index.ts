@@ -1,6 +1,7 @@
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { bpmRoutes } from './features/get-bpm/api/routes.js';
 import { chordRoutes } from './features/get-chord/api/routes.js';
 import { searchRoutes } from './features/search-chords/api/routes.js';
 import { env } from './shared/config/env.js';
@@ -16,6 +17,7 @@ app.use(
 
 app.route('/api', chordRoutes);
 app.route('/api', searchRoutes);
+app.route('/api', bpmRoutes);
 
 serve(
   {

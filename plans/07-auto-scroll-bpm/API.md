@@ -126,13 +126,13 @@ interface ServerBpmCacheEntry {
 
 ## Checklist
 
-- [ ] `GETSONGBPM_API_KEY` em `env.ts` (opcional em dev — retorna 501 se ausente)
-- [ ] Cliente HTTP GetSongBPM com timeout (5s) e User-Agent identificando Cifra Hub
-- [ ] Handler: resolver nomes (`artistName`/`songName`) — usar query params ou buscar cifra principal (evitar se possível; preferir params do web)
-- [ ] Normalizar `tempo` string → `number` (faixa 40–220; fora da faixa → 404)
-- [ ] Rota `GET /api/bpm` registrada em `apps/api/src/index.ts`
-- [ ] Testes unitários em `packages/shared`: parse resposta, matching artista/título, clamp BPM
-- [ ] Log warn em miss (sem vazar API key)
+- [x] `GETSONGBPM_API_KEY` em `env.ts` (opcional em dev — retorna 501 se ausente)
+- [x] Cliente HTTP GetSongBPM com timeout (5s) e User-Agent identificando Cifra Hub
+- [x] Handler: resolver nomes (`artistName`/`songName`) — usar query params ou buscar cifra principal (evitar se possível; preferir params do web)
+- [x] Normalizar `tempo` string → `number` (faixa 40–220; fora da faixa → 404)
+- [x] Rota `GET /api/bpm` registrada em `apps/api/src/index.ts`
+- [x] Testes unitários em `packages/shared`: parse resposta, matching artista/título, clamp BPM
+- [x] Log warn em miss (sem vazar API key)
 
 ## Verificação (curl)
 

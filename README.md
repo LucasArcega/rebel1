@@ -45,7 +45,10 @@ npm run dev:web   # http://localhost:5173
 GET /api/search?q=avenged sevenfold buried alive
 GET /api/artists/:artist/songs/:song
 GET /api/artists/:artist/songs/:song?instrument=bass
+GET /api/bpm?artist=ac-dc&song=highway-to-hell&artistName=AC%2FDC&songName=Highway%20to%20Hell
 ```
+
+BPM automático usa GetSongBPM via `apps/api`. Copie `.env.example` para `apps/api/.env` e defina `GETSONGBPM_API_KEY`. Sem a chave, o endpoint responde 501 e o app cai em tap tempo / BPM manual.
 
 ## Offline
 

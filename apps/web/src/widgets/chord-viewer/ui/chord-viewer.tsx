@@ -1,8 +1,16 @@
+import { useEffect, useState } from 'react';
 import type { ChordSearchParams, ChordSong } from '@/entities/chord';
-import { AutoScrollControls, useAutoScroll } from '@/features/auto-scroll-chord';
+import {
+  AutoScrollBpmControls,
+  GetsongAttribution,
+  useAutoScrollBpm,
+  useTapTempo,
+} from '@/features/auto-scroll-chord';
 import { ChordDisplayControls, useChordDisplaySettings } from '@/features/chord-display';
+import { resolveBpmErrorMessage, useBpmQuery } from '@/features/fetch-bpm';
 import { ChordTransposeControls, useChordTranspose } from '@/features/transpose-chord';
 import { VersionSelector } from '@/features/select-version';
+import { shouldFetchRemoteBpm } from '@/shared/lib/scroll-bpm-storage';
 import { ChordContent } from './chord-content';
 import { ChordMeta } from './chord-meta';
 import { SongChordStrip } from './song-chord-strip';
@@ -12,15 +20,59 @@ interface ChordViewerProps {
   fetchParams: Pick<ChordSearchParams, 'instrument' | 'version'>;
 }
 
+const LINE_HEIGHT_FALLBACK = {
+  sm: 19,
+  md: 23,
+  lg: 26,
+} as const;
+
 const ChordViewerState = ({ chord, fetchParams }: ChordViewerProps) => {
   const activeVersion = chord.versions.find((version) => version.id === chord.versionId);
   const transpose = useChordTranspose(chord);
-  const autoScroll = useAutoScroll();
   const display = useChordDisplaySettings();
+  const [lineHeight, setLineHeight] = useState<number>(LINE_HEIGHT_FALLBACK[display.fontSize]);
+  const bpmQuery = useBpmQuery(
+    {
+      artist: chord.artistSlug,
+      song: chord.songSlug,
+      artistName: chord.artistName,
+      songName: chord.songName,
+    },
+    { enabled: shouldFetchRemoteBpm(chord.artistSlug, chord.songSlug) },
+  );
+  const autoScroll = useAutoScrollBpm({
+    artistSlug: chord.artistSlug,
+    songSlug: chord.songSlug,
+    lineHeight,
+    lookup: bpmQuery.data,
+    isFetchingBpm: bpmQuery.isPending,
+    bpmError: bpmQuery.isError ? resolveBpmErrorMessage(bpmQuery.error) : null,
+  });
+  const tapTempo = useTapTempo(autoScroll.applyTapBpm);
   const instrument = fetchParams.instrument ?? activeVersion?.instrumentSlug;
   const diagramsDisabledReason = instrument && !['cifra-group', 'guitar'].includes(instrument)
     ? 'Diagramas disponíveis apenas para cifras de violão'
     : undefined;
+
+  useEffect(() => {
+    const line = autoScroll.contentRef.current?.querySelector('.chord-line');
+    if (!line) {
+      setLineHeight(LINE_HEIGHT_FALLBACK[display.fontSize]);
+      return;
+    }
+
+    const applyHeight = () => {
+      const measured = Number.parseFloat(getComputedStyle(line).lineHeight);
+      if (Number.isFinite(measured) && measured > 0) {
+        setLineHeight(measured);
+      }
+    };
+
+    applyHeight();
+    const observer = new ResizeObserver(applyHeight);
+    observer.observe(line);
+    return () => observer.disconnect();
+  }, [autoScroll.contentRef, display.fontSize, chord.versionId]);
 
   return (
     <section className="chord-viewer">
@@ -44,11 +96,17 @@ const ChordViewerState = ({ chord, fetchParams }: ChordViewerProps) => {
               onReset={transpose.reset}
             />
           )}
-          <AutoScrollControls
+          <AutoScrollBpmControls
             isPlaying={autoScroll.isPlaying}
-            speed={autoScroll.speed}
+            bpm={autoScroll.bpm}
+            linesPerBeat={autoScroll.linesPerBeat}
+            bpmSource={autoScroll.bpmSource}
+            isFetchingBpm={autoScroll.isFetchingBpm}
+            bpmError={autoScroll.bpmError}
             onToggle={autoScroll.toggle}
-            onSpeedChange={autoScroll.setSpeed}
+            onBpmChange={autoScroll.setBpm}
+            onLinesPerBeatChange={autoScroll.setLinesPerBeat}
+            onTap={tapTempo.tap}
           />
           <ChordDisplayControls
             fontSize={display.fontSize}
@@ -58,6 +116,8 @@ const ChordViewerState = ({ chord, fetchParams }: ChordViewerProps) => {
             onPrint={display.printChord}
           />
         </div>
+
+        <GetsongAttribution visible={autoScroll.bpmSource === 'getsong'} />
       </aside>
 
       <div className="chord-viewer__stage">
