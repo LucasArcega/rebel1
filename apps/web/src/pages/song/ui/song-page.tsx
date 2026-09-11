@@ -46,7 +46,6 @@ export const SongPage = () => {
   });
 
   const chord = data?.chord;
-  const source = data?.source;
 
   if (isLoading) {
     return (
@@ -70,7 +69,7 @@ export const SongPage = () => {
 
   return (
     <div className="page page--song">
-      <ChordViewer chord={chord} source={source} fetchParams={{ instrument, version }} />
+      <ChordViewer chord={chord} fetchParams={{ instrument, version }} />
     </div>
   );
 };

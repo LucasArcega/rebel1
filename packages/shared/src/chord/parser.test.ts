@@ -89,6 +89,60 @@ describe('parseCifraClubHtml', () => {
     expect(result?.chords).toBeUndefined();
   });
 
+  it('keeps every nested drop-tuning tab block for cifra-group', () => {
+    const html = [
+      wrapChunk(
+        [
+          '#t1#Intro Lead',
+          '#t2#D|----10----|',
+          'A|-----9----|',
+          'F|-----7----|',
+          'C|-----0----|#/t2##/t1#',
+          '',
+          'Pre-Chorus',
+          '',
+          '#t1#Intro Base',
+          '#t2#D|-8---|',
+          'A|-10--|#/t2##/t1#',
+        ].join('\n'),
+      ),
+      wrapChunk(
+        '{"songData":{"priorityVersions":[],"artist":{"name":"Killswitch Engage"},"song":{"name":"My Curse"},"id":1,"status":0,"tone":"Bb","tuning":"E A D G B E"}}',
+      ),
+    ].join('');
+
+    const result = parseCifraClubHtml(html, 'killswitch-engage', 'my-curse', BASE);
+    expect(result?.content).toContain('Intro Lead');
+    expect(result?.content).toContain('D|----10----|');
+    expect(result?.content).toContain('F|-----7----|');
+    expect(result?.content).toContain('Pre-Chorus');
+    expect(result?.content).toContain('Intro Base');
+    expect(result?.content).toContain('D|-8---|');
+    expect(result?.content).not.toContain('#t1#');
+    expect(result?.content).not.toContain('#t2#');
+  });
+
+  it('expands compact drop-tuning tabs glued into a single line', () => {
+    const html = [
+      wrapChunk(
+        'Intro:D--------------------------------------------------------------------------|A------------10------------------10-----------------6----------------6-----|F----10----------10------10----------10-------5--------5------5---------5--|C-8------8------------8------8-------------5-----5---------5------5--------|G--------------------------------------------------------------------------|C--------------------------------------------------------------------------|Intro Continued:D----------------------------------------------------------------|A----------6---------------5--6------------6---------------5--6--|F----5--------5------5---------------5--------5------5-----------|C-7-----7---------7-----7---------7-----7---------7-----7--------| X2G----------------------------------------------------------------|C----------------------------------------------------------------|',
+      ),
+      wrapChunk(
+        '{"songData":{"priorityVersions":[],"artist":{"name":"Killswitch Engage"},"song":{"name":"My Curse Intro"},"id":121077,"status":0,"tone":"Bb","tuning":"E A D G B E"}}',
+      ),
+    ].join('');
+
+    const result = parseCifraClubHtml(html, 'killswitch-engage', 'my-curse-intro', BASE);
+    expect(result?.content).toContain('Intro');
+    expect(result?.content).toContain('D|--------------------------------------------------------------------------|');
+    expect(result?.content).toContain('A|------------10------------------10-----------------6----------------6-----|');
+    expect(result?.content).toContain('F|----10----------10------10----------10-------5--------5------5---------5--|');
+    expect(result?.content).toContain('Intro Continued');
+    expect(result?.content).toContain('X2');
+    expect(result?.content).toMatch(/^G\|/m);
+    expect(result?.content.split('\n').length).toBeGreaterThan(10);
+  });
+
   it('parses bass tablature', () => {
     const result = parseCifraClubHtml(BASS_HTML, 'avenged-sevenfold', 'buried-alive--', BASE, 'bass');
     expect(result?.content).toContain('G|');
@@ -153,5 +207,17 @@ describe('parseCifraClubHtml', () => {
     expect(result?.content).not.toContain('[Tab - Intro]');
     expect(result?.content).not.toContain('E|----------|');
     expect(result?.chords?.map((chord) => chord.symbol)).toEqual(['D7M', 'B2']);
+  });
+
+  it('reads tone from the Cifra Club chord-tone control when JSON omits it', () => {
+    const html = [
+      '<button type="button" data-anchor="--chord-tone">D</button>',
+      wrapChunk('[Primeira Parte]\\n<b>D7M</b>'),
+      wrapChunk(
+        '{"songData":{"priorityVersions":[],"artist":{"name":"Foo Fighters"},"song":{"name":"Everlong"},"id":887,"status":0}}',
+      ),
+    ].join('');
+
+    expect(parseCifraClubHtml(html, 'foo-fighters', 'everlong', BASE)?.tone).toBe('D');
   });
 });

@@ -17,7 +17,6 @@ export const ChordMeta = ({ chord, displayTone, capoFret = 0 }: ChordMetaProps) 
       </span>
       {capoFret > 0 && <span>Capotraste: casa {capoFret}</span>}
       {chord.tuning && <span>Afinação: {chord.tuning}</span>}
-      {chord.hits && <span>{chord.hits.toLocaleString('pt-BR')} visualizações</span>}
     </div>
 
     {chord.composers.length > 0 && (

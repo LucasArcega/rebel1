@@ -15,7 +15,7 @@ const INSTRUMENT_PATHS: Record<string, string> = {
   guitarpro: '/guitarpro',
 };
 
-const TAB_LINE_PATTERN = /^[EADGB]\|/m;
+const TAB_LINE_PATTERN = /^[A-Ga-g][#b]?\s*\|/m;
 const RSC_PAYLOAD_STOP_MARKERS = ['","metadata"', '"\\n"]', '</pre>'];
 const CHUNK_STOP_MARKERS = [...RSC_PAYLOAD_STOP_MARKERS, '"/t', '#/t'];
 const TABLATURE_STOP_MARKERS = [
@@ -183,29 +183,79 @@ const extractLyricsContent = (chunks: string[]): string | null => {
   return null;
 };
 
+const unwrapTabMarkers = (value: string): string =>
+  decodeChordEntities(value)
+    .replace(TAB_MARKER_PATTERN, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
+const COMPACT_TAB_PATTERN = /[A-Ga-g][#b]?-[^|\n]{3,}\|[A-Ga-g][#b]?-/;
+const COMPACT_STRING_PATTERN = /([^|]*)([A-Ga-g][#b]?)(-[^|]*)\|/g;
+const TAB_REPEAT_MARKER = /^x\s*\d+$/i;
+
+const expandCompactTablature = (raw: string): string | null => {
+  if (!COMPACT_TAB_PATTERN.test(raw) || TAB_LINE_PATTERN.test(raw)) return null;
+
+  const lines: string[] = [];
+
+  for (const match of raw.matchAll(COMPACT_STRING_PATTERN)) {
+    const prefix = match[1].trim();
+    const note = match[2];
+    const body = match[3];
+
+    if (prefix) {
+      if (TAB_REPEAT_MARKER.test(prefix)) {
+        const last = lines.at(-1);
+        if (last) {
+          lines[lines.length - 1] = `${last} ${prefix}`;
+        } else {
+          lines.push(prefix);
+        }
+      } else {
+        if (lines.length) lines.push('');
+        lines.push(prefix.replace(/:$/, ''));
+      }
+    }
+
+    lines.push(`${note}|${body}|`);
+  }
+
+  return lines.filter((line) => /\|/.test(line)).length >= 2 ? lines.join('\n').trim() : null;
+};
+
 const extractTablatureContent = (chunk: string): string | null => {
   if (!chunk.includes('#t1#') || !chunk.includes('|')) return null;
 
-  const marker = chunk.indexOf('#t1#');
-  const start = chunk.indexOf('E|', marker);
-  if (start === -1) return null;
+  const start = chunk.indexOf('#t1#');
+  const body = sliceUntilMarkers(chunk, start, RSC_PAYLOAD_STOP_MARKERS);
+  const extracted = unwrapTabMarkers(body);
+  return extracted.includes('|') ? extracted : null;
+};
 
-  const extracted = cleanExtractedContent(sliceUntilMarkers(chunk, start, TABLATURE_STOP_MARKERS));
-  return extracted || null;
+const extractCompactTablatureContent = (chunk: string): string | null => {
+  if (!chunk.includes('|')) return null;
+
+  const compactStart = chunk.search(COMPACT_TAB_PATTERN);
+  if (compactStart === -1) return null;
+
+  const prefix = chunk.slice(0, compactStart);
+  const start = prefix.length <= 500 && !/[{<]/.test(prefix) ? 0 : compactStart;
+  const body = sliceUntilMarkers(chunk, start, RSC_PAYLOAD_STOP_MARKERS);
+  return expandCompactTablature(body);
 };
 
 const extractGenericTablatureContent = (chunk: string): string | null => {
   if (!TAB_LINE_PATTERN.test(chunk)) return null;
 
-  const match = chunk.match(/^(?:Intro|Vers[oõ]|Refr[aã]o|\d+:\d+)?\s*\n?[EADGB]\|/m);
-  const tabStart = match?.index ?? chunk.search(/[EADGB]\|/);
+  const match = chunk.match(/^(?:Intro|Vers[oõ]|Refr[aã]o|\d+:\d+)?\s*\n?[A-Ga-g][#b]?\s*\|/m);
+  const tabStart = match?.index ?? chunk.search(/[A-Ga-g][#b]?\s*\|/);
   if (tabStart === -1) return null;
 
   const prefix = chunk.slice(0, tabStart);
   const start = prefix.length <= 500 && !/[{<]/.test(prefix) ? 0 : tabStart;
 
   const slice = sliceUntilMarkers(chunk, start, TABLATURE_STOP_MARKERS);
-  if ((slice.match(/^[EADGB]\|/gm) ?? []).length < 2) return null;
+  if ((slice.match(/^[A-Ga-g][#b]?\s*\|/gm) ?? []).length < 2) return null;
 
   const extracted = cleanExtractedContent(slice);
   return extracted || null;
@@ -248,6 +298,7 @@ const extractChordContent = (chunks: string[], instrument: InstrumentSlug): stri
   const lyricChords = () => extractFirstMatch(chunks, extractLyricChordContent);
   const tablature = () =>
     extractFirstMatch(chunks, extractTablatureContent) ??
+    extractFirstMatch(chunks, extractCompactTablatureContent) ??
     extractFirstMatch(chunks, extractGenericTablatureContent);
 
   const preferLyricChords = LYRIC_CHORD_INSTRUMENTS.has(instrument);
@@ -269,6 +320,11 @@ const extractJsonField = (text: string, field: string): string | null => {
   const pattern = new RegExp(`"${field}"\\s*:\\s*"([^"]+)"`);
   return text.match(pattern)?.[1] ?? null;
 };
+
+const extractTone = (html: string, songChunk: string): string | null =>
+  extractJsonField(songChunk, 'tone')
+  ?? html.match(/data-anchor="--chord-tone"[^>]*>([^<]+)</i)?.[1]?.trim()
+  ?? null;
 
 export const buildVersionPath = (
   artistSlug: string,
@@ -362,7 +418,7 @@ export const parseCifraClubHtml = (
     songSlug;
 
   const versionId = Number(songChunk.match(/"id":(\d+),"status":0/)?.[1] ?? 0);
-  const tone = songChunk.match(/"tone"\s*:\s*"([^"]+)"/)?.[1] ?? null;
+  const tone = extractTone(html, songChunk);
   const tuning = songChunk.match(/"tuning"\s*:\s*"([^"]+)"/)?.[1] ?? null;
   const hits = Number(songChunk.match(/"all_time_hits"\s*:\s*(\d+)/)?.[1] ?? 0) || null;
 

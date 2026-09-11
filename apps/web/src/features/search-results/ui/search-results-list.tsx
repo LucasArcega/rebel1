@@ -59,7 +59,6 @@ export const SearchResultsList = ({
             <div>
               <strong>{result.songName}</strong>
               <span>{result.artistName}</span>
-              {result.hits && <small>{result.hits.toLocaleString('pt-BR')} visualizações</small>}
             </div>
           </Link>
         </li>

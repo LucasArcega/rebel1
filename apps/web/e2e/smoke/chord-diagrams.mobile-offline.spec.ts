@@ -31,11 +31,11 @@ test('viewport móvel mantém scroll local e o picker funciona por teclado', asy
 test('reabre a cifra e seus diagramas offline sem acessar a API', async ({ page }) => {
   await mockChordRoute(page);
   await page.goto(songUrl);
-  await expect(page.getByText('Salva offline')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Diagramas' })).toBeVisible();
   await expect(page.getByRole('img', { name: /^Diagrama de Am/ })).toBeVisible();
 
   await failChordRoute(page);
   await page.reload();
-  await expect(page.getByText('Offline', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Diagramas' })).toBeVisible();
   await expect(page.getByRole('region', { name: 'Acordes desta música' }).getByRole('img')).toHaveCount(7);
 });

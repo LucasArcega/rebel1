@@ -10,7 +10,7 @@ const BOLD_CHORD = /<b>([\s\S]*?)<\/b>/gi;
 const SECTION_HEADER = /^\[[^\]]+\]$/;
 const TUNING_LINE = /^\s*afina(?:ção|cao)\s*:/i;
 
-const isTabLine = (line: string) => /^[EADGBe]\|/.test(line.trim());
+const isTabLine = (line: string) => /^[A-Ga-g][#b]?\s*\|/.test(line.trim());
 const isChordToken = (token: string) => Boolean(parseChordSymbol(token));
 
 const isChordLine = (line: string) => {
