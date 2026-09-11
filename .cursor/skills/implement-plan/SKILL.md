@@ -1,3 +1,8 @@
+---
+name: implement-plan
+description: Entrega end-to-end de plano numerado Cifra Hub em plans/{NN}-{slug}/ — enriquecer, branch a partir de main, implementar API/web/testes, revisar, validar e handoff. Use quando o usuário pedir "vamos para o NN", "implemente o plano", ou entrega completa do ticket.
+---
+
 # Implement Plan (Cifra Hub)
 
 Runbook de entrega completa de um plano numerado (`{NN}-{slug}`). Cobre o ciclo **plano → branch → implementação → lacunas → code review → testes → handoff**.
@@ -315,6 +320,9 @@ Consulte `plans/STATUS.md` para lista atualizada.
 | Skill | Quando |
 |-------|--------|
 | `implement-plan` (este) | Entrega completa de plano numerado |
+| `enrich-plans` | Só analisar/completar `plans/`, sem código |
+| `fast-merge` | Merge git direto em `main`, sem PR/CI |
+| `write-kanban-tickets` | Redigir ticket/critérios em pt-BR |
 | `walkthrough-artifacts` | Evidência visual após testes manuais |
 | `browser-use` | Automação de testes no browser |
 | Bugbot subagent | Fase 5 (obrigatório) |

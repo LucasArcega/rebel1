@@ -1,0 +1,18 @@
+---
+description: Dependências FSD no web e shared sem vazar domínio para a UI base
+globs: "apps/web/src/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Camadas FSD (web)
+
+```
+pages → widgets → features → entities → shared
+```
+
+- `shared/` não importa `entities`, `features`, `widgets` ou `pages`
+- `entities` não importam `features`, `widgets` ou `pages`
+- Lógica de cifra/harmonia/fingering reutilizável vive em `packages/shared`, não em widgets
+- UI de domínio fica na slice (ex.: `entities/chord-diagram`); primitives genéricos em `shared/ui`
+
+Espelha a regra JourneyCore de dependência unidirecional, aplicada ao React FSD deste repo.

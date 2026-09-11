@@ -1,0 +1,56 @@
+---
+description: Clean Code — métodos pequenos, nomes claros, DRY, baixa complexidade
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Clean Code
+
+## Funções pequenas e focadas
+
+- Uma função faz **uma coisa**
+- Preferir < 20 linhas; extrair se maior
+- Evitar mais de 2–3 níveis de indentação
+
+```ts
+// ❌
+export async function process() {
+  const data = await fetchAll();
+  for (const item of data) {
+    if (item.isValid) {
+      await save(transform(item));
+    }
+  }
+}
+
+// ✅
+export async function process() {
+  const data = await fetchAll();
+  for (const item of data.filter((entry) => entry.isValid)) {
+    await processItem(item);
+  }
+}
+```
+
+## Nomes expressivos
+
+- Revelar intenção; evitar abreviações obscuras
+- Funções: verbo + substantivo (`parseChordSymbol`, `findBassVersionId`)
+
+## DRY
+
+- Se o mesmo bloco aparece em 2+ lugares, extrair helper em `packages/shared` ou `shared/lib`
+
+## Complexidade
+
+- Early return / guard clauses em vez de `else` aninhado
+
+```ts
+if (!user || user.isPasswordSet) return;
+await send(user);
+```
+
+## Comentários
+
+- Explicar **porquê**, não o óbvio
+- TODO: contexto do problema

@@ -1,0 +1,20 @@
+---
+description: Issues, tickets e planos devem ser sempre em português brasileiro (pt-BR)
+alwaysApply: true
+---
+
+# Issues e Tickets em Português (pt-BR)
+
+Issues, tickets, critérios de aceite e documentação em `plans/` vinculados a entrega devem ser em **pt-BR**.
+
+## O que deve estar em pt-BR
+
+- Títulos de planos e tickets
+- Descrições, comentários de PR sobre o ticket e handoffs
+- Critérios de aceite e seções **Fora do escopo**
+
+## Exceções
+
+- Código (identificadores, comentários técnicos) — inglês, padrão do repo
+- Termos técnicos (API, endpoint, slug, BPM, Solr)
+- Nomes de branch e pastas: `{NN}-{kebab-slug}` em inglês

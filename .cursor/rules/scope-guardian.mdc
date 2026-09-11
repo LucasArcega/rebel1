@@ -1,0 +1,33 @@
+---
+description: Alterar apenas o que for relevante para o plano ou tarefa atual; evitar refactorings fora do escopo
+alwaysApply: true
+---
+
+# Guardião de Escopo
+
+Não fazer refactorings ou alterações quando **não fizerem parte expressa** do tópico.
+
+## Regra principal
+
+**Alterar apenas o que for relevante para o plano ou tarefa.** Evitar "já que estamos aqui".
+
+## Quando seguir
+
+- Feature: só arquivos necessários
+- Bug: corrigir sem refatorar adjacente
+- Pergunta/análise: **não editar**
+- Plano: respeitar o escopo; não expandir sem pedido explícito
+
+## Exemplos
+
+| Situação | ❌ Evitar | ✅ Preferir |
+|----------|-----------|-------------|
+| Corrigir typo | Typo + reformatar + renomear outros arquivos | Só o typo |
+| Novo endpoint | Endpoint + refatorar o handler inteiro | Endpoint e o mínimo |
+| Plano: validação no parser | Validação + mudar FSD de widgets não citados | Validação e testes que quebrarem |
+
+## Exceções
+
+- Pedido explícito de refatoração ampla
+- Quebra de interface que exige ajuste em outro arquivo
+- Bug que só se resolve no código relacionado

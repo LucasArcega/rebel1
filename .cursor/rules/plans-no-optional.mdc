@@ -1,0 +1,36 @@
+---
+description: Pedido = obrigatório; proibir itens opcionais em planos, tickets e DoD
+alwaysApply: true
+---
+
+# Escopo sem "opcional"
+
+**Se foi pedido** — plano, critério de aceite ou instrução explícita — **é obrigatório**.
+
+Nunca incluir itens opcionais em `plans/`, tickets, critérios de aceite ou Definition of Done.
+
+Palavras proibidas no escopo commitado: opcional, nice to have, se der tempo, recomendado, mínimo, "pode incluir", fase opcional.
+
+## Três estados permitidos
+
+| Estado | Significado |
+|--------|-------------|
+| **Obrigatório** | Está no pedido ou foi aceito — entra no DoD |
+| **Fora do escopo** | Não é este plano — documentar motivo ou plano relacionado |
+| **Sugestão** | Fora do plano; só vira obrigatório após aceite explícito |
+
+Não existe quarto estado ("opcional no plano").
+
+## Como sugerir extras
+
+> "Posso incluir X neste plano — quer que entre no escopo ou abrimos follow-up?"
+
+- Aceitou → critério obrigatório ou novo plano numerado
+- Recusou ou silêncio → não entra; não marcar como pendência opcional
+
+## Ao escrever ou revisar planos
+
+- `plans/{NN}-{slug}/README.md` — critérios só obrigatórios ou **Fora do escopo**
+- `API.md` / `WEB.md` / `PLAYWRIGHT.md` / `MANUAL.md` — mesma regra
+- Não marcar **Implementado** com itens "opcionais" abertos
+- Follow-up futuro → `plans/{NN}-{slug}/`, não bullet opcional

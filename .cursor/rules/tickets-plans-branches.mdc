@@ -1,0 +1,70 @@
+---
+description: Padrões de planos em plans/, nomenclatura de branches e fluxo Git
+alwaysApply: true
+---
+
+# Tickets, Plans e Branches
+
+Referências: `plans/STATUS.md`, skills `implement-plan`, `enrich-plans` e `write-kanban-tickets`.
+
+## Fluxo Git
+
+```
+{branch de trabalho}  →  main
+```
+
+Alvo padrão de merge/PR: **`main`**. Fast-merge sem PR quando o usuário pedir (skill `fast-merge`).
+
+**Repositório:** GitHub `LucasArcega/rebel1` (`origin`).
+
+## Nomenclatura de branches
+
+**Regra principal:** nome da branch = nome da pasta em `plans/` (match exato).
+
+```
+{NN}-{kebab-slug}
+```
+
+| ✅ Correto | ❌ Evitar |
+|-----------|----------|
+| `07-auto-scroll-bpm` | `feature/auto-scroll` (sem número) |
+| `10-base-ui-design-system` | `07_auto_scroll` (underscore) |
+
+Prefixos aceitos fora de ticket numerado: `fix/{slug}`, `cursor/{slug}`, `codex/{slug}`.
+
+## Pasta `plans/`
+
+```
+plans/{NN}-{slug}/
+├── README.md       # índice — obrigatório
+├── API.md          # se houver apps/api ou packages/shared de servidor
+├── WEB.md          # se houver apps/web
+├── PLAYWRIGHT.md   # se houver UI testável
+└── MANUAL.md       # smoke no browser / curl
+```
+
+### README.md — campos obrigatórios
+
+```markdown
+# Plano {NN}: {Título}
+
+**Branch:** `{NN}-{slug}`
+**Status:** Planejado | Em progresso | Implementado
+**Prioridade:** {n} ({grupo})
+**Dependências:** {outras} ou nenhuma
+```
+
+### Regras de documentação
+
+- Sem itens opcionais — `.cursor/rules/plans-no-optional.mdc`
+- Back + front em arquivos **separados** (`API.md` / `WEB.md`)
+- Idioma: pt-BR em títulos, summaries e critérios
+- Consultar `plans/STATUS.md` antes de marcar Implementado
+- UI testável: `PLAYWRIGHT.md` com smoke; dark se houver tema; `@real` só quando o fluxo depende da API viva
+
+## Checklist ao iniciar plano
+
+1. Branch `{NN}-{slug}` a partir de `main`
+2. Pasta `plans/{NN}-{slug}/` com README (+ API/WEB/PLAYWRIGHT/MANUAL se aplicável)
+3. Implementar via skill `implement-plan`
+4. Commit/PR/merge só com pedido explícito (ou `fast-merge` se pedido)
