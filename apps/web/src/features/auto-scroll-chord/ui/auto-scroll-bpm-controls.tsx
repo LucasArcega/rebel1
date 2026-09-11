@@ -102,7 +102,11 @@ export const AutoScrollBpmControls = ({
         <span className="auto-scroll__hint">{linesPerBeat.toFixed(2)}</span>
       </label>
 
-      {bpmError && <p className="auto-scroll__message">{bpmError}</p>}
+      {bpmError && (
+        <p className="auto-scroll__message" role="alert">
+          {bpmError}
+        </p>
+      )}
     </div>
   );
 };

@@ -31,6 +31,7 @@ const ChordViewerState = ({ chord, fetchParams }: ChordViewerProps) => {
   const transpose = useChordTranspose(chord);
   const display = useChordDisplaySettings();
   const [lineHeight, setLineHeight] = useState<number>(LINE_HEIGHT_FALLBACK[display.fontSize]);
+  const fetchRemoteBpm = shouldFetchRemoteBpm(chord.artistSlug, chord.songSlug);
   const bpmQuery = useBpmQuery(
     {
       artist: chord.artistSlug,
@@ -38,15 +39,15 @@ const ChordViewerState = ({ chord, fetchParams }: ChordViewerProps) => {
       artistName: chord.artistName,
       songName: chord.songName,
     },
-    { enabled: shouldFetchRemoteBpm(chord.artistSlug, chord.songSlug) },
+    { enabled: fetchRemoteBpm },
   );
   const autoScroll = useAutoScrollBpm({
     artistSlug: chord.artistSlug,
     songSlug: chord.songSlug,
     lineHeight,
     lookup: bpmQuery.data,
-    isFetchingBpm: bpmQuery.isPending,
-    bpmError: bpmQuery.isError ? resolveBpmErrorMessage(bpmQuery.error) : null,
+    isFetchingBpm: fetchRemoteBpm && bpmQuery.isLoading,
+    bpmError: fetchRemoteBpm && bpmQuery.isError ? resolveBpmErrorMessage(bpmQuery.error) : null,
   });
   const tapTempo = useTapTempo(autoScroll.applyTapBpm);
   const instrument = fetchParams.instrument ?? activeVersion?.instrumentSlug;
