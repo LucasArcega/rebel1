@@ -108,6 +108,7 @@ const ChordViewerState = ({ chord, fetchParams }: ChordViewerProps) => {
             onBpmChange={autoScroll.setBpm}
             onLinesPerBeatChange={autoScroll.setLinesPerBeat}
             onTap={tapTempo.tap}
+            tapCount={tapTempo.tapCount}
           />
           <ChordDisplayControls
             fontSize={display.fontSize}

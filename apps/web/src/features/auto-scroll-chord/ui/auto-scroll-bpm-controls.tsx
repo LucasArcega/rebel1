@@ -12,6 +12,7 @@ interface AutoScrollBpmControlsProps {
   onBpmChange: (bpm: number) => void;
   onLinesPerBeatChange: (linesPerBeat: number) => void;
   onTap: () => void;
+  tapCount?: number;
 }
 
 const sourceLabel = (
@@ -48,6 +49,7 @@ export const AutoScrollBpmControls = ({
   onBpmChange,
   onLinesPerBeatChange,
   onTap,
+  tapCount = 0,
 }: AutoScrollBpmControlsProps) => {
   const badge = sourceLabel(bpmSource, isFetchingBpm);
 
@@ -62,8 +64,8 @@ export const AutoScrollBpmControls = ({
         <button type="button" className="auto-scroll__btn" onClick={onToggle}>
           {isPlaying ? 'Pausar' : 'Rolar'}
         </button>
-        <button type="button" className="auto-scroll__btn" onClick={onTap}>
-          Tap
+        <button type="button" className="auto-scroll__btn" onClick={onTap} aria-label="Tap tempo">
+          {tapCount > 0 ? `Tap · ${tapCount}` : 'Tap'}
         </button>
       </div>
 
