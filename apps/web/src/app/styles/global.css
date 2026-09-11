@@ -538,6 +538,11 @@ a:hover {
   font: inherit;
 }
 
+.auto-scroll__btn {
+  min-height: 2.25rem;
+  min-width: 4.5rem;
+}
+
 .auto-scroll,
 .chord-display-controls {
   display: flex;
