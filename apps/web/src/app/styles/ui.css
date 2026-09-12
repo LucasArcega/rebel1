@@ -158,6 +158,7 @@
 }
 
 .ui-dialog-popup {
+  position: relative;
   display: grid;
   gap: var(--space-4);
   width: min(var(--dialog-max-width, 560px), calc(100vw - (2 * var(--overlay-gap))));

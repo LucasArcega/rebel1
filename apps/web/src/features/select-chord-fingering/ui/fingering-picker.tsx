@@ -38,7 +38,11 @@ export const FingeringPicker = ({
   };
 
   return (
-    <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
+    <Dialog open onOpenChange={(open) => {
+      if (open) return;
+      onClose();
+      openerRef.current?.focus();
+    }}>
       <Dialog.Portal>
         <Dialog.Backdrop />
         <Dialog.Viewport>

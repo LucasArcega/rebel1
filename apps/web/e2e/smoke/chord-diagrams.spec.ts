@@ -105,7 +105,7 @@ test.describe('dicionário de acordes', () => {
     await expect(page.getByRole('img', { name: /^Diagrama de E9\/G#/ })).toBeVisible();
 
     await page.getByRole('combobox', { name: 'Capotraste' }).click();
-    await page.getByRole('option', { name: 'Casa 1' }).click();
+    await page.getByRole('option', { name: 'Casa 1', exact: true }).click();
     await expect(page.getByText('Transposição efetiva: +1 semitom(s)')).toBeVisible();
     await expect(page.getByText('D#9/G', { exact: true })).toHaveCount(2);
 

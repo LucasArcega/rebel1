@@ -24,20 +24,23 @@ test.describe('overlays de acordes', () => {
     await page.goto(songUrl);
 
     const chord = page.getByRole('button', { name: 'Acorde C. Diagrama e variações disponíveis' }).first();
-    await chord.hover();
+    await chord.focus();
     const preview = page.getByRole('group', { name: 'Diagrama e variações de C' });
     await expect(preview).toBeVisible();
+    const popoverZ = Number(await preview.evaluate((element) => getComputedStyle(element).zIndex || '0'));
     await preview.getByRole('button', { name: /ver \d+ variações/i }).hover();
     await expect(preview).toBeVisible();
 
     await preview.getByRole('button', { name: /ver \d+ variações/i }).click();
     const dialog = page.getByRole('dialog', { name: 'Variações de C' });
     await expect(dialog).toBeVisible();
+    await expect(preview).toBeHidden();
     await expect(page.locator('[data-slot="dialog-backdrop"]')).toBeVisible();
-    expect(Number(await preview.evaluate((element) => getComputedStyle(element).zIndex || '0'))).toBeLessThanOrEqual(
-      Number(await page.locator('[data-slot="dialog-popup"]').evaluate((element) => getComputedStyle(element).zIndex)),
-    );
+    const dialogZ = Number(await page.locator('[data-slot="dialog-viewport"]').evaluate((element) => getComputedStyle(element).zIndex));
+    expect(popoverZ).toBeGreaterThan(100);
+    expect(dialogZ).toBeGreaterThan(popoverZ);
 
+    await page.mouse.move(0, 0);
     await page.keyboard.press('Escape');
     await expect(dialog).toBeHidden();
     await expect(chord).toBeFocused();
@@ -47,20 +50,26 @@ test.describe('overlays de acordes', () => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(songUrl);
 
-    const chords = page.getByRole('button', { name: /Acorde .+\. Diagrama e variações disponíveis/ });
-    await chords.first().hover();
-    await assertInsideViewport(page, page.locator('[data-slot="popover-popup"]'));
+    const firstChord = page.getByRole('button', { name: 'Acorde Am. Diagrama e variações disponíveis' }).first();
+    await firstChord.hover();
+    const firstPreview = page.getByRole('group', { name: 'Diagrama e variações de Am' });
+    await expect(firstPreview).toBeVisible();
+    await assertInsideViewport(page, firstPreview);
+    await page.keyboard.press('Escape');
 
-    await chords.last().hover();
-    await assertInsideViewport(page, page.locator('[data-slot="popover-popup"]'));
+    const lastChord = page.getByRole('button', { name: 'Acorde E. Diagrama e variações disponíveis' }).last();
+    await lastChord.hover();
+    const lastPreview = page.getByRole('group', { name: 'Diagrama e variações de E' });
+    await expect(lastPreview).toBeVisible();
+    await assertInsideViewport(page, lastPreview);
 
-    const popup = page.locator('[data-slot="popover-popup"]');
-    const popupBox = await popup.boundingBox();
-    const sidebar = page.locator('.chord-viewer__sidebar');
-    const sidebarBox = await sidebar.boundingBox();
+    const popupBox = await lastPreview.boundingBox();
+    const sidebarBox = await page.locator('.chord-viewer__sidebar').boundingBox();
     expect(popupBox).not.toBeNull();
     expect(sidebarBox).not.toBeNull();
-    expect(popupBox!.x + popupBox!.width).toBeGreaterThan(sidebarBox!.x + sidebarBox!.width - 8);
+    const overlapX = Math.min(popupBox!.x + popupBox!.width, sidebarBox!.x + sidebarBox!.width) - Math.max(popupBox!.x, sidebarBox!.x);
+    const overlapY = Math.min(popupBox!.y + popupBox!.height, sidebarBox!.y + sidebarBox!.height) - Math.max(popupBox!.y, sidebarBox!.y);
+    expect(overlapX <= 0 || overlapY <= 0).toBe(true);
   });
 
   test('uma forma permanece compacta e várias formas cabem em 560px', async ({ page }) => {

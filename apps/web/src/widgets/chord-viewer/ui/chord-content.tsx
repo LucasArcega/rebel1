@@ -30,21 +30,50 @@ const ChordToken = ({ symbol, tuning }: { symbol: string; tuning?: string | null
   const { selectedId, selectFingering } = useFingeringPreference(normalizedSymbol, fingerings);
   const [open, setOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const pickerOpenRef = useRef(false);
+  const skipFocusOpenRef = useRef(false);
   const fingering = fingerings.find((item) => item.id === selectedId) ?? fingerings[0];
+
+  const openPicker = () => {
+    pickerOpenRef.current = true;
+    setOpen(false);
+    setPickerOpen(true);
+  };
+
+  const closePicker = () => {
+    skipFocusOpenRef.current = true;
+    pickerOpenRef.current = false;
+    setPickerOpen(false);
+  };
 
   if (!fingering) return <span className="chord-token">{symbol}</span>;
 
   return (
     <>
-      <Popover open={open} onOpenChange={(next) => { if (!pickerOpen) setOpen(next); }}>
+      <Popover
+        open={open && !pickerOpen}
+        onOpenChange={(next) => {
+          if (pickerOpenRef.current) {
+            setOpen(false);
+            return;
+          }
+          setOpen(next);
+        }}
+      >
         <Popover.Trigger
           ref={anchorRef}
           className="chord-token chord-token--previewable"
           aria-label={`Acorde ${symbol}. Diagrama e variações disponíveis`}
-          openOnHover
+          openOnHover={!pickerOpen}
           delay={0}
           closeDelay={140}
-          onFocus={() => setOpen(true)}
+          onFocus={() => {
+            if (skipFocusOpenRef.current) {
+              skipFocusOpenRef.current = false;
+              return;
+            }
+            if (!pickerOpenRef.current) setOpen(true);
+          }}
         >
           {symbol}
         </Popover.Trigger>
@@ -62,10 +91,7 @@ const ChordToken = ({ symbol, tuning }: { symbol: string; tuning?: string | null
                 size="compact"
                 className="chord-token-popover__variations"
                 aria-haspopup="dialog"
-                onClick={() => {
-                  setOpen(false);
-                  setPickerOpen(true);
-                }}
+                onClick={openPicker}
               >
                 {fingerings.length === 1 ? 'Ver detalhes' : `Ver ${fingerings.length} variações`}
               </Button>
@@ -79,7 +105,7 @@ const ChordToken = ({ symbol, tuning }: { symbol: string; tuning?: string | null
           fingerings={fingerings}
           selectedId={fingering.id}
           openerRef={anchorRef}
-          onClose={() => setPickerOpen(false)}
+          onClose={closePicker}
           onSelect={selectFingering}
         />
       )}
