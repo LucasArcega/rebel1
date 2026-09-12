@@ -22,4 +22,28 @@ export default tseslint.config(
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     },
   },
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    ignores: ['src/shared/ui/**'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        paths: [
+          {
+            name: '@base-ui/react',
+            message: 'Importe primitives de @/shared/ui. Base UI é infraestrutura interna.',
+          },
+        ],
+        patterns: [
+          {
+            group: ['@base-ui/react/*'],
+            message: 'Importe primitives de @/shared/ui. Base UI é infraestrutura interna.',
+          },
+          {
+            group: ['@/shared/ui/*', '@/shared/ui/*/'],
+            message: 'Importe o barrel público @/shared/ui em vez de arquivos internos.',
+          },
+        ],
+      }],
+    },
+  },
 );

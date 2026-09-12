@@ -1,3 +1,5 @@
+import { Button, IconButton, Select } from '@/shared/ui';
+
 interface ChordTransposeControlsProps {
   manualSemitones: number;
   capoFret: number;
@@ -7,6 +9,11 @@ interface ChordTransposeControlsProps {
   onCapoChange: (fret: number) => void;
   onReset: () => void;
 }
+
+const capoItems = Array.from({ length: 12 }, (_, fret) => ({
+  value: String(fret),
+  label: fret === 0 ? 'Sem capo' : `Casa ${fret}`,
+}));
 
 export const ChordTransposeControls = ({
   manualSemitones,
@@ -21,40 +28,31 @@ export const ChordTransposeControls = ({
     <div className="chord-transpose__group">
       <span className="chord-transpose__label">Tom</span>
       <div className="chord-transpose__buttons">
-        <button type="button" className="chord-transpose__btn" onClick={onDecrease} aria-label="Descer meio tom">
+        <IconButton aria-label="Descer meio tom" variant="secondary" size="compact" onClick={onDecrease}>
           −
-        </button>
+        </IconButton>
         <span className="chord-transpose__value">
           {manualSemitones > 0 ? `+${manualSemitones}` : manualSemitones}
         </span>
-        <button type="button" className="chord-transpose__btn" onClick={onIncrease} aria-label="Subir meio tom">
+        <IconButton aria-label="Subir meio tom" variant="secondary" size="compact" onClick={onIncrease}>
           +
-        </button>
+        </IconButton>
       </div>
     </div>
 
-    <div className="chord-transpose__group">
-      <label className="chord-transpose__label" htmlFor="capo-fret">Capotraste</label>
-      <select
-        id="capo-fret"
-        className="chord-transpose__select"
-        value={capoFret}
-        onChange={(event) => onCapoChange(Number(event.target.value))}
-      >
-        {Array.from({ length: 12 }, (_, fret) => (
-          <option key={fret} value={fret}>
-            {fret === 0 ? 'Sem capo' : `Casa ${fret}`}
-          </option>
-        ))}
-      </select>
-    </div>
+    <Select
+      label="Capotraste"
+      value={String(capoFret)}
+      onValueChange={(value) => onCapoChange(Number(value))}
+      items={capoItems}
+    />
 
     {(manualSemitones !== 0 || capoFret !== 0) && (
       <div className="chord-transpose__summary">
         <span>Transposição efetiva: {effectiveSemitones > 0 ? `+${effectiveSemitones}` : effectiveSemitones} semitom(s)</span>
-        <button type="button" className="chord-transpose__reset" onClick={onReset}>
+        <Button type="button" variant="ghost" size="compact" onClick={onReset}>
           Resetar
-        </button>
+        </Button>
       </div>
     )}
   </div>

@@ -22,5 +22,23 @@ export default defineConfig({
   test: {
     environment: 'node',
     exclude: ['e2e/**', 'node_modules/**', 'dist/**'],
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'node',
+          environment: 'node',
+          exclude: ['e2e/**', 'node_modules/**', 'dist/**', 'src/shared/ui/**/*.test.tsx'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'jsdom',
+          environment: 'jsdom',
+          include: ['src/shared/ui/**/*.test.tsx'],
+        },
+      },
+    ],
   },
 });

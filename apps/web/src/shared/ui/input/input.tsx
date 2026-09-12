@@ -1,5 +1,5 @@
 import type { InputHTMLAttributes } from 'react';
 
 export const Input = ({ className = '', ...props }: InputHTMLAttributes<HTMLInputElement>) => (
-  <input className={`input ${className}`} {...props} />
+  <input data-slot="input" className={`input ${className}`} {...props} />
 );

@@ -69,7 +69,6 @@ test.describe('dicionário de acordes', () => {
 
     const preview = page.getByRole('group', { name: 'Diagrama e variações de D9/F#' });
     await expect(preview).toBeVisible();
-    await expect(preview).toHaveCSS('position', 'fixed');
     expect(Number(await preview.evaluate((element) => getComputedStyle(element).zIndex))).toBeGreaterThan(100);
 
     const bounds = await preview.boundingBox();
@@ -83,7 +82,7 @@ test.describe('dicionário de acordes', () => {
     const dialog = page.getByRole('dialog', { name: 'Variações de D9/F#' });
     await expect(dialog).toBeVisible();
     expect((await dialog.boundingBox())!.width).toBeLessThanOrEqual(320);
-    expect((await dialog.locator('.chord-diagram').boundingBox())!.width).toBeLessThanOrEqual(198);
+    expect((await dialog.locator('[data-slot="chord-diagram"]').boundingBox())!.width).toBeLessThanOrEqual(198);
   });
 
   test('descarta uma preferência inexistente sem quebrar o card', async ({ page }) => {
@@ -105,7 +104,8 @@ test.describe('dicionário de acordes', () => {
     await expect(page.getByText('E9/G#', { exact: true })).toHaveCount(2);
     await expect(page.getByRole('img', { name: /^Diagrama de E9\/G#/ })).toBeVisible();
 
-    await page.getByLabel('Capotraste').selectOption('1');
+    await page.getByRole('combobox', { name: 'Capotraste' }).click();
+    await page.getByRole('option', { name: 'Casa 1', exact: true }).click();
     await expect(page.getByText('Transposição efetiva: +1 semitom(s)')).toBeVisible();
     await expect(page.getByText('D#9/G', { exact: true })).toHaveCount(2);
 

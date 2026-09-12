@@ -1,34 +1,11 @@
-:root,
-[data-theme='dark'] {
-  color-scheme: dark;
-  --bg: #0f1115;
-  --surface: #171a21;
-  --surface-2: #1f2430;
-  --border: #2a3142;
-  --text: #f4f6fb;
-  --muted: #9aa4b2;
-  --accent: #ff7a1a;
-  --accent-hover: #ff8f3d;
-  --danger: #ff6b6b;
-  --radius: 14px;
-  --shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
-  font-family: Inter, system-ui, sans-serif;
-  background: radial-gradient(circle at top, #1a2030 0%, var(--bg) 45%);
-  color: var(--text);
+html {
+  font-family: var(--font-body);
+  background: radial-gradient(circle at top, #1a2030 0%, var(--color-bg) 45%);
+  color: var(--color-text);
 }
 
 [data-theme='light'] {
-  color-scheme: light;
-  --bg: #f3f4f6;
-  --surface: #ffffff;
-  --surface-2: #eef1f6;
-  --border: #d5dbe7;
-  --text: #111827;
-  --muted: #5b6577;
-  --accent: #e56a00;
-  --accent-hover: #c95a00;
-  --shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
-  background: linear-gradient(180deg, #ffffff 0%, var(--bg) 100%);
+  background: linear-gradient(180deg, #ffffff 0%, var(--color-bg) 100%);
 }
 
 * {
@@ -62,7 +39,8 @@ a:hover {
   backdrop-filter: blur(10px);
   position: sticky;
   top: 0;
-  background: rgba(15, 17, 21, 0.85);
+  z-index: var(--layer-header);
+  background: var(--color-header);
 }
 
 .app-logo {
@@ -750,23 +728,8 @@ a:hover {
 }
 
 .chord-token-popover {
-  position: fixed;
-  z-index: 200;
-  display: grid;
-  gap: 0.4rem;
   width: 176px;
-  padding: 0.55rem;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface);
-  box-shadow: var(--shadow);
-  color: var(--text);
-  transform: translateX(-50%);
   white-space: normal;
-}
-
-.chord-token-popover--above {
-  transform: translate(-50%, -100%);
 }
 
 .chord-token-popover__variations {
@@ -930,59 +893,30 @@ a:hover {
 
 .chord-diagram__base-fret { font-size: 10px; }
 
-.fingering-picker__backdrop {
-  position: fixed;
-  z-index: 100;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  padding: 1rem;
-  background: rgba(0, 0, 0, 0.62);
-}
-
 .fingering-picker {
-  display: grid;
-  gap: 1rem;
-  width: min(760px, 100%);
-  max-height: min(720px, calc(100dvh - 2rem));
-  padding: 1rem;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-  box-shadow: var(--shadow);
-}
-
-.fingering-picker.fingering-picker--compact {
-  width: min(320px, 100%);
+  gap: var(--space-4);
 }
 
 .fingering-picker__header {
   display: flex;
   justify-content: space-between;
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 .fingering-picker__header h2,
 .fingering-picker__header p { margin: 0; }
-.fingering-picker__header p { margin-top: 0.3rem; color: var(--muted); }
-
-.fingering-picker__close {
-  min-width: 44px;
-  height: 44px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface-2);
-  color: var(--text);
-  cursor: pointer;
-  font-size: 1.4rem;
-}
+.fingering-picker__header p { margin-top: 0.3rem; color: var(--color-muted); }
 
 .fingering-picker__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 0.75rem;
+  gap: var(--space-3);
+  min-height: 0;
   overflow-y: auto;
+}
+
+.fingering-picker[data-size='compact'] .fingering-picker__grid {
+  grid-template-columns: 1fr;
 }
 
 .fingering-option {
@@ -990,29 +924,29 @@ a:hover {
   justify-items: center;
   gap: 0.35rem;
   min-width: 0;
-  min-height: 44px;
+  min-height: var(--control-hit-target);
   padding: 0.75rem;
-  border: 1px solid var(--border);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
-  background: var(--surface-2);
-  color: var(--text);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
   cursor: pointer;
   font: inherit;
   text-align: center;
 }
 
 .fingering-option--selected {
-  border-color: var(--accent);
-  box-shadow: inset 0 0 0 1px var(--accent);
+  border-color: var(--color-accent);
+  box-shadow: inset 0 0 0 1px var(--color-accent);
 }
 
 .fingering-option__meta,
 .fingering-option__tags { font-size: 0.75rem; }
-.fingering-option__tags { color: var(--muted); }
+.fingering-option__tags { color: var(--color-muted); }
 
 .song-chord-card__variations:focus-visible,
-.fingering-picker button:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
+.fingering-option:focus-visible {
+  outline: var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -1066,6 +1000,13 @@ a:hover {
 
   .fingering-picker__backdrop,
   .chord-token-popover,
+  [data-slot='popover-popup'],
+  [data-slot='popover-positioner'],
+  [data-slot='dialog-popup'],
+  [data-slot='dialog-backdrop'],
+  [data-slot='dialog-viewport'],
+  [data-slot='tooltip-popup'],
+  [data-slot='select-popup'],
   .song-chord-card__variations,
   .song-chord-strip__heading span {
     display: none !important;
@@ -1147,22 +1088,5 @@ a:hover {
 
   .song-chord-strip {
     padding-inline: 1rem;
-  }
-
-  .fingering-picker__backdrop {
-    align-items: end;
-    padding: 0;
-  }
-
-  .fingering-picker {
-    width: 100%;
-    max-height: min(78dvh, 680px);
-    border-radius: var(--radius) var(--radius) 0 0;
-  }
-
-  .fingering-picker.fingering-picker--compact {
-    width: min(320px, calc(100% - 1.5rem));
-    margin-bottom: 0.75rem;
-    border-radius: var(--radius);
   }
 }
