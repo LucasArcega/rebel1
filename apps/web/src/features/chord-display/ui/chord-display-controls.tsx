@@ -1,4 +1,5 @@
 import type { FontSize } from '../model/use-chord-display-settings';
+import { Button, Select } from '@/shared/ui';
 
 interface ChordDisplayControlsProps {
   fontSize: FontSize;
@@ -8,6 +9,12 @@ interface ChordDisplayControlsProps {
   onPrint: () => void;
 }
 
+const fontItems = [
+  { value: 'sm', label: 'Pequena' },
+  { value: 'md', label: 'Média' },
+  { value: 'lg', label: 'Grande' },
+] as const;
+
 export const ChordDisplayControls = ({
   fontSize,
   theme,
@@ -16,22 +23,17 @@ export const ChordDisplayControls = ({
   onPrint,
 }: ChordDisplayControlsProps) => (
   <div className="chord-display-controls">
-    <label className="chord-display-controls__group">
-      Fonte
-      <select
-        value={fontSize}
-        onChange={(event) => onFontSizeChange(event.target.value as FontSize)}
-      >
-        <option value="sm">Pequena</option>
-        <option value="md">Média</option>
-        <option value="lg">Grande</option>
-      </select>
-    </label>
-    <button type="button" className="chord-display-controls__btn" onClick={onToggleTheme}>
+    <Select
+      label="Fonte"
+      value={fontSize}
+      onValueChange={onFontSizeChange}
+      items={fontItems}
+    />
+    <Button type="button" variant="secondary" size="compact" onClick={onToggleTheme}>
       Tema {theme === 'dark' ? 'claro' : 'escuro'}
-    </button>
-    <button type="button" className="chord-display-controls__btn" onClick={onPrint}>
+    </Button>
+    <Button type="button" variant="secondary" size="compact" onClick={onPrint}>
       Imprimir
-    </button>
+    </Button>
   </div>
 );

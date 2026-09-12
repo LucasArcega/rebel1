@@ -15,6 +15,7 @@
     "test:e2e:real": "playwright test --grep @real"
   },
   "dependencies": {
+    "@base-ui/react": "^1.8.0",
     "@cifra-hub/shared": "*",
     "@tanstack/react-query": "^5.76.1",
     "react": "^19.1.0",
@@ -25,6 +26,9 @@
   "devDependencies": {
     "@eslint/js": "^9.27.0",
     "@playwright/test": "^1.63.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
     "@types/react": "^19.1.4",
     "@types/react-dom": "^19.1.5",
     "@vitejs/plugin-react": "^4.4.1",
@@ -32,6 +36,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.1.0",
+    "jsdom": "^29.1.1",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.32.1",
     "vite": "^6.3.5",

@@ -13,7 +13,7 @@
 | 07 | [auto-scroll-bpm](./07-auto-scroll-bpm/README.md) | **Implementado** | `cursor/plan-07-auto-scroll-bpm-974b` |
 | 08 | [dicionario-acordes-variacoes](./08-dicionario-acordes-variacoes/README.md) | **Em revisão** | `codex/08-dicionario-acordes-variacoes-impl` |
 | 09 | [busca-local-e-filtros](./09-busca-local-e-filtros/README.md) | Planejado | — |
-| 10 | [base-ui-design-system](./10-base-ui-design-system/README.md) | Planejado | — |
+| 10 | [base-ui-design-system](./10-base-ui-design-system/README.md) | Em progresso | `cursor/plan-10-base-ui-design-system-ddb2` |
 
 ## Próximos planos
 

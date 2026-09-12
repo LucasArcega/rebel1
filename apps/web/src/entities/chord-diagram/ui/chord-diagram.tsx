@@ -34,7 +34,7 @@ export const ChordDiagram = ({
   const description = describeFingering(fingering);
 
   return (
-    <figure className={`chord-diagram chord-diagram--${size}`}>
+    <figure className={`chord-diagram chord-diagram--${size}`} data-slot="chord-diagram">
       {showTitle && <figcaption className="chord-diagram__title">{symbol}</figcaption>}
       <svg
         className="chord-diagram__svg"

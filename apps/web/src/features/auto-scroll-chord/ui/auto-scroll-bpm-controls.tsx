@@ -1,5 +1,6 @@
 import { LINES_PER_BEAT_STEP, MAX_BPM, MAX_LINES_PER_BEAT, MIN_BPM, MIN_LINES_PER_BEAT } from '@cifra-hub/shared';
 import type { BpmSource } from '@cifra-hub/shared';
+import { Button, Input, Slider } from '@/shared/ui';
 
 interface AutoScrollBpmControlsProps {
   isPlaying: boolean;
@@ -61,48 +62,46 @@ export const AutoScrollBpmControls = ({
       </div>
 
       <div className="auto-scroll__actions">
-        <button type="button" className="auto-scroll__btn" onClick={onToggle}>
+        <Button type="button" variant="secondary" size="compact" onClick={onToggle}>
           {isPlaying ? 'Pausar' : 'Rolar'}
-        </button>
-        <button type="button" className="auto-scroll__btn" onClick={onTap} aria-label="Tap tempo">
+        </Button>
+        <Button type="button" variant="secondary" size="compact" onClick={onTap} aria-label="Tap tempo">
           {tapCount > 0 ? `Tap · ${tapCount}` : 'Tap'}
-        </button>
+        </Button>
       </div>
 
-      <label className="auto-scroll__field">
-        BPM
+      <div className="auto-scroll__field">
         <div className="auto-scroll__bpm">
-          <input
+          <Input
             type="number"
             min={MIN_BPM}
             max={MAX_BPM}
             step={1}
             value={bpm}
+            aria-label="BPM"
             onChange={(event) => onBpmChange(Number(event.target.value))}
           />
-          <input
-            type="range"
+          <Slider
+            aria-label="Ajuste de BPM"
             min={MIN_BPM}
             max={MAX_BPM}
             step={1}
             value={bpm}
-            onChange={(event) => onBpmChange(Number(event.target.value))}
+            onValueChange={onBpmChange}
           />
         </div>
-      </label>
+      </div>
 
-      <label className="auto-scroll__field">
-        Linhas por batida
-        <input
-          type="range"
-          min={MIN_LINES_PER_BEAT}
-          max={MAX_LINES_PER_BEAT}
-          step={LINES_PER_BEAT_STEP}
-          value={linesPerBeat}
-          onChange={(event) => onLinesPerBeatChange(Number(event.target.value))}
-        />
-        <span className="auto-scroll__hint">{linesPerBeat.toFixed(2)}</span>
-      </label>
+      <Slider
+        label="Linhas por batida"
+        aria-label="Linhas por batida"
+        min={MIN_LINES_PER_BEAT}
+        max={MAX_LINES_PER_BEAT}
+        step={LINES_PER_BEAT_STEP}
+        value={linesPerBeat}
+        onValueChange={onLinesPerBeatChange}
+      />
+      <span className="auto-scroll__hint">{linesPerBeat.toFixed(2)}</span>
 
       {bpmError && (
         <p className="auto-scroll__message" role="alert">

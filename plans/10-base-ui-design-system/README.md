@@ -1,8 +1,8 @@
-# Plano 10 — Base UI e design system
+# Plano 10: Base UI e design system
 
-**Status:** Planejado  
-**Prioridade:** 1 — fundação de frontend  
-**Branch prevista:** `codex/10-base-ui-design-system`  
+**Branch:** `10-base-ui-design-system`
+**Status:** Em progresso
+**Prioridade:** 1 (fundação de frontend)
 **Dependências:** Plano 08 (diagramas, hover e variações que serão a primeira migração)
 
 ## Motivação
@@ -60,9 +60,22 @@ Como equipe de produto, queremos componentes, tokens e layouts com APIs document
 - Criar Storybook ou publicar um pacote externo de componentes.
 - Alterar parser, catálogo de acordes, API ou persistência de negócio.
 
-## Documentos de implementação
+## Arquivos de implementação
 
-- [WEB.md](./WEB.md) — arquitetura, tokens, primitives, layouts e migração.
-- [PLAYWRIGHT.md](./PLAYWRIGHT.md) — cobertura automatizada de interação e geometria.
-- [MANUAL.md](./MANUAL.md) — roteiro visual e de acessibilidade.
+- [WEB.md](./WEB.md) — arquitetura, tokens, primitives, layouts e migração
+- [PLAYWRIGHT.md](./PLAYWRIGHT.md) — cobertura automatizada de interação e geometria
+- [MANUAL.md](./MANUAL.md) — roteiro visual e de acessibilidade
+
+## Validação esperada
+
+```bash
+npm run typecheck
+npm run lint
+npm run build
+npm test -w @cifra-hub/web
+npm run test:e2e -w @cifra-hub/web -- e2e/smoke/ui-system.spec.ts
+npm run test:e2e -w @cifra-hub/web -- e2e/smoke/chord-overlays.spec.ts
+```
+
+Abrir `http://localhost:5173/ui-system` e uma cifra com uma e várias formas; repetir no tema claro. Preview de produção não expõe `/ui-system`.
 

@@ -21,6 +21,9 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
+    environmentMatchGlobs: [
+      ['src/shared/ui/**/*.test.tsx', 'jsdom'],
+    ],
     exclude: ['e2e/**', 'node_modules/**', 'dist/**'],
   },
 });
